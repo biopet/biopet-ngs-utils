@@ -3,6 +3,8 @@ name := "biopet-ngs-utils"
 
 scalaVersion := "2.11.11"
 
+resolvers += Resolver.sonatypeRepo("snapshots")
+
 libraryDependencies += "com.github.biopet" %% "biopet-common-utils" % "0.1.0-SNAPSHOT"
 libraryDependencies += "com.github.samtools" % "htsjdk" % "2.11.0"
 
