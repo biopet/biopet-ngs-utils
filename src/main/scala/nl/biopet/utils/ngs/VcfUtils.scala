@@ -33,7 +33,8 @@ object VcfUtils {
     */
   def getLongestAllele(vcfRecord: VariantContext): Allele = {
     val alleles = vcfRecord.getAlleles
-    val longestAlleleId = alleles.map(_.getBases.length).zipWithIndex.maxBy(_._1)._2
+    val longestAlleleId =
+      alleles.map(_.getBases.length).zipWithIndex.maxBy(_._1)._2
     alleles(longestAlleleId)
   }
 
@@ -57,7 +58,8 @@ object VcfUtils {
     * @param array scala List[Any]
     * @return converted java ArrayList[Object]
     */
-  def scalaListToJavaObjectArrayList(array: List[Any]): util.ArrayList[Object] = {
+  def scalaListToJavaObjectArrayList(
+      array: List[Any]): util.ArrayList[Object] = {
     val out = new util.ArrayList[Object]()
 
     array.foreach {
@@ -76,7 +78,8 @@ object VcfUtils {
   }
 
   //TODO: Add genotype comparing to this function
-  def identicalVariantContext(var1: VariantContext, var2: VariantContext): Boolean = {
+  def identicalVariantContext(var1: VariantContext,
+                              var2: VariantContext): Boolean = {
     var1.getContig == var2.getContig &&
     var1.getStart == var2.getStart &&
     var1.getEnd == var2.getEnd &&
@@ -111,7 +114,9 @@ object VcfUtils {
     * @param minGQ minimum genome quality value
     * @return
     */
-  def hasMinGenomeQuality(record: VariantContext, sample: String, minGQ: Int): Boolean = {
+  def hasMinGenomeQuality(record: VariantContext,
+                          sample: String,
+                          minGQ: Int): Boolean = {
     if (!record.getSampleNamesOrderedByName.contains(sample))
       throw new IllegalArgumentException("Sample does not exist")
     val gt = record.getGenotype(sample)
@@ -132,7 +137,9 @@ object VcfUtils {
     val name = vcfFile.getAbsolutePath
     if (name.endsWith(".vcf")) new File(name + ".idx")
     else if (name.endsWith(".vcf.gz")) new File(name + ".tbi")
-    else throw new IllegalArgumentException(s"File given is no vcf file: $vcfFile")
+    else
+      throw new IllegalArgumentException(
+        s"File given is no vcf file: $vcfFile")
   }
 
   def vcfFileIsEmpty(file: File): Boolean = {
@@ -148,8 +155,8 @@ object VcfUtils {
     * @return boolean
     */
   def isCompoundNoCall(genotype: Genotype): Boolean = {
-    genotype.isCalled && genotype.getAlleles.exists(_.isNoCall) && genotype.getAlleles.exists(
-      _.isReference)
+    genotype.isCalled && genotype.getAlleles.exists(_.isNoCall) && genotype.getAlleles
+      .exists(_.isReference)
   }
 
   /** Give back the number of alleles that overlap */

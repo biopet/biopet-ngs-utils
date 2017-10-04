@@ -60,7 +60,10 @@ object FastaUtils {
   }
 
   /** This method returns the fraction of GC for a given region */
-  def getSequenceGc(fastaFile: File, contig: String, start: Long, end: Long): Double = {
+  def getSequenceGc(fastaFile: File,
+                    contig: String,
+                    start: Long,
+                    end: Long): Double = {
     getSequenceGc(new IndexedFastaSequenceFile(fastaFile), contig, start, end)
   }
 
@@ -71,8 +74,10 @@ object FastaUtils {
                     end: Long): Double = {
     require(referenceFile.isIndexed)
     val sequence = referenceFile.getSubsequenceAt(contig, start, end)
-    val gcCount = sequence.getBaseString.toLowerCase.count(c => c == 'c' || c == 'g')
-    val atCount = sequence.getBaseString.toLowerCase.count(c => c == 'a' || c == 't')
+    val gcCount =
+      sequence.getBaseString.toLowerCase.count(c => c == 'c' || c == 'g')
+    val atCount =
+      sequence.getBaseString.toLowerCase.count(c => c == 'a' || c == 't')
     val gc = gcCount.toDouble / (gcCount + atCount)
     gc
   }
@@ -85,7 +90,8 @@ object FastaUtils {
       .map { line =>
         val columns = line.split("\t")
         val refContig = columns(0)
-        val alternativeNames = columns.lift(1).map(_.split(";").toSet).getOrElse(Set())
+        val alternativeNames =
+          columns.lift(1).map(_.split(";").toSet).getOrElse(Set())
         refContig -> alternativeNames
       }
       .toMap
@@ -97,11 +103,14 @@ object FastaUtils {
     readContigMap(file).flatMap(x => x._2.map(y => y -> x._1))
   }
 
-  def rebuildContigMap(contigMap: File, referenceFasta: File): Map[String, Set[String]] = {
+  def rebuildContigMap(contigMap: File,
+                       referenceFasta: File): Map[String, Set[String]] = {
     rebuildContigMap(contigMap, getDictFromFasta(referenceFasta))
   }
 
-  def rebuildContigMap(contigMap: File, dict: SAMSequenceDictionary): Map[String, Set[String]] = {
+  def rebuildContigMap(
+      contigMap: File,
+      dict: SAMSequenceDictionary): Map[String, Set[String]] = {
     val map = readContigMap(contigMap)
     (for (contig <- dict.getSequences) yield {
       val name = contig.getSequenceName

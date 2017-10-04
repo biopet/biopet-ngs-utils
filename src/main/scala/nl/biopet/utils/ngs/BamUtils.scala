@@ -16,7 +16,12 @@ package nl.biopet.utils.ngs
 
 import java.io.File
 
-import htsjdk.samtools.{SAMReadGroupRecord, SAMSequenceDictionary, SamReader, SamReaderFactory}
+import htsjdk.samtools.{
+  SAMReadGroupRecord,
+  SAMSequenceDictionary,
+  SamReader,
+  SamReaderFactory
+}
 import nl.biopet.utils.ngs.intervals.{BedRecord, BedRecordList}
 
 import scala.collection.JavaConversions._
@@ -43,13 +48,16 @@ object BamUtils {
     readers.map(x => x._1 -> x._2._2)
   }
 
-  def sampleBamReaderMap(bamFiles: List[File]): Map[String, (SamReader, File)] = {
+  def sampleBamReaderMap(
+      bamFiles: List[File]): Map[String, (SamReader, File)] = {
     val temp = bamFiles.map { file =>
       val inputSam = SamReaderFactory.makeDefault.open(file)
-      val samples = inputSam.getFileHeader.getReadGroups.map(_.getSample).distinct
+      val samples =
+        inputSam.getFileHeader.getReadGroups.map(_.getSample).distinct
       if (samples.size == 1) samples.head -> (inputSam, file)
       else if (samples.size > 1)
-        throw new IllegalArgumentException("Bam contains multiple sample IDs: " + file)
+        throw new IllegalArgumentException(
+          "Bam contains multiple sample IDs: " + file)
       else
         throw new IllegalArgumentException(
           "Bam does not contain sample ID or have no readgroups defined: " + file)
@@ -66,7 +74,8 @@ object BamUtils {
     * @param bamFiles input bam files
     * @return Map of sample readgroups
     */
-  def sampleReadGroups(bamFiles: List[File]): Map[String, List[SAMReadGroupRecord]] = {
+  def sampleReadGroups(
+      bamFiles: List[File]): Map[String, List[SAMReadGroupRecord]] = {
     val sampleBamFiles = sampleBamMap(bamFiles)
     sampleBamFiles.map {
       case (sampleName, bamFile) =>
@@ -77,8 +86,8 @@ object BamUtils {
     }
   }
 
-  def sampleReadGroups(
-      readers: Map[String, (SamReader, File)]): Map[String, List[SAMReadGroupRecord]] = {
+  def sampleReadGroups(readers: Map[String, (SamReader, File)])
+    : Map[String, List[SAMReadGroupRecord]] = {
     readers.map {
       case (sampleName, (reader, bamFile)) =>
         sampleName -> reader.getFileHeader.getReadGroups.toList
@@ -110,7 +119,8 @@ object BamUtils {
       .flatMap({ bedRecord =>
         // for each scatter, open the bamfile for this specific region-query
         val inputSam: SamReader = SamReaderFactory.makeDefault.open(inputBam)
-        val samIterator = inputSam.query(bedRecord.chr, bedRecord.start, bedRecord.end, true)
+        val samIterator =
+          inputSam.query(bedRecord.chr, bedRecord.start, bedRecord.end, true)
 
         val counts: mutable.Map[Int, Int] = mutable.Map()
 
@@ -157,18 +167,21 @@ object BamUtils {
     * @param bamFile bamfile to estimate average insertsize from
     * @return
     */
-  def sampleBamInsertSize(bamFile: File, samplingSize: Int = 10000, binSize: Int = 1000000): Int = {
+  def sampleBamInsertSize(bamFile: File,
+                          samplingSize: Int = 10000,
+                          binSize: Int = 1000000): Int = {
     val inputSam: SamReader = SamReaderFactory.makeDefault.open(bamFile)
-    val bamInsertSizes = inputSam.getFileHeader.getSequenceDictionary.getSequences.par
-      .map({ contig =>
-        BamUtils.contigInsertSize(bamFile,
-                                  contig.getSequenceName,
-                                  1,
-                                  contig.getSequenceLength,
-                                  samplingSize,
-                                  binSize)
-      })
-      .toList
+    val bamInsertSizes =
+      inputSam.getFileHeader.getSequenceDictionary.getSequences.par
+        .map({ contig =>
+          BamUtils.contigInsertSize(bamFile,
+                                    contig.getSequenceName,
+                                    1,
+                                    contig.getSequenceLength,
+                                    samplingSize,
+                                    binSize)
+        })
+        .toList
     val counts = bamInsertSizes.flatten
 
     // avoid division by zero
@@ -182,9 +195,10 @@ object BamUtils {
     * @param bamFiles input bam files
     * @return
     */
-  def sampleBamsInsertSize(bamFiles: List[File],
-                           samplingSize: Int = 10000,
-                           binSize: Int = 1000000): immutable.ParMap[File, Int] =
+  def sampleBamsInsertSize(
+      bamFiles: List[File],
+      samplingSize: Int = 10000,
+      binSize: Int = 1000000): immutable.ParMap[File, Int] =
     bamFiles.par.map { bamFile =>
       bamFile -> sampleBamInsertSize(bamFile, samplingSize, binSize)
     }.toMap
@@ -199,11 +213,15 @@ object BamUtils {
       * @param that Dict to compare to
       * @param ignoreOrder When true the order of the contig does not matter
       */
-    def assertSameDictionary(that: SAMSequenceDictionary, ignoreOrder: Boolean): Unit = {
+    def assertSameDictionary(that: SAMSequenceDictionary,
+                             ignoreOrder: Boolean): Unit = {
       if (ignoreOrder) {
         assert(samDicts.getReferenceLength == that.getReferenceLength)
         val thisContigNames =
-          samDicts.getSequences.map(x => (x.getSequenceName, x.getSequenceLength)).sorted.toSet
+          samDicts.getSequences
+            .map(x => (x.getSequenceName, x.getSequenceLength))
+            .sorted
+            .toSet
         assert(
           thisContigNames == that.getSequences
             .map(x => (x.getSequenceName, x.getSequenceLength))

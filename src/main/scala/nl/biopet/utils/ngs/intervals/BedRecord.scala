@@ -24,19 +24,20 @@ import scala.collection.mutable.ListBuffer
 /**
   * Created by pjvanthof on 20/08/15.
   */
-case class BedRecord(chr: String,
-                     start: Int,
-                     end: Int,
-                     name: Option[String] = None,
-                     score: Option[Double] = None,
-                     strand: Option[Boolean] = None,
-                     thickStart: Option[Int] = None,
-                     thickEnd: Option[Int] = None,
-                     rgbColor: Option[(Int, Int, Int)] = None,
-                     blockCount: Option[Int] = None,
-                     blockSizes: IndexedSeq[Int] = IndexedSeq(),
-                     blockStarts: IndexedSeq[Int] = IndexedSeq(),
-                     protected[intervals] val _originals: List[BedRecord] = Nil) {
+case class BedRecord(
+    chr: String,
+    start: Int,
+    end: Int,
+    name: Option[String] = None,
+    score: Option[Double] = None,
+    strand: Option[Boolean] = None,
+    thickStart: Option[Int] = None,
+    thickEnd: Option[Int] = None,
+    rgbColor: Option[(Int, Int, Int)] = None,
+    blockCount: Option[Int] = None,
+    blockSizes: IndexedSeq[Int] = IndexedSeq(),
+    blockStarts: IndexedSeq[Int] = IndexedSeq(),
+    protected[intervals] val _originals: List[BedRecord] = Nil) {
 
   def originals(nested: Boolean = true): List[BedRecord] = {
     if (_originals.isEmpty) List(this)
@@ -100,17 +101,21 @@ case class BedRecord(chr: String,
     } else None
 
   lazy val utr5: Option[BedRecord] = (strand, thickStart, thickEnd) match {
-    case (Some(true), Some(tStart), Some(tEnd)) if tStart > start && tEnd < end =>
+    case (Some(true), Some(tStart), Some(tEnd))
+        if tStart > start && tEnd < end =>
       Some(BedRecord(chr, start, tStart, name.map(_ + "_utr5")))
-    case (Some(false), Some(tStart), Some(tEnd)) if tStart > start && tEnd < end =>
+    case (Some(false), Some(tStart), Some(tEnd))
+        if tStart > start && tEnd < end =>
       Some(BedRecord(chr, tEnd, end, name.map(_ + "_utr5")))
     case _ => None
   }
 
   lazy val utr3: Option[BedRecord] = (strand, thickStart, thickEnd) match {
-    case (Some(false), Some(tStart), Some(tEnd)) if tStart > start && tEnd < end =>
+    case (Some(false), Some(tStart), Some(tEnd))
+        if tStart > start && tEnd < end =>
       Some(BedRecord(chr, start, tStart, name.map(_ + "_utr3")))
-    case (Some(true), Some(tStart), Some(tEnd)) if tStart > start && tEnd < end =>
+    case (Some(true), Some(tStart), Some(tEnd))
+        if tStart > start && tEnd < end =>
       Some(BedRecord(chr, tEnd, end, name.map(_ + "_utr3")))
     case _ => None
   }
@@ -141,20 +146,24 @@ case class BedRecord(chr: String,
   def validate: BedRecord = {
     require(start < end, "Start is greater then end")
     (thickStart, thickEnd) match {
-      case (Some(s), Some(e)) => require(s <= e, "Thick start is greater then end")
+      case (Some(s), Some(e)) =>
+        require(s <= e, "Thick start is greater then end")
       case _ =>
     }
     blockCount match {
       case Some(count) =>
-        require(count == blockSizes.length, "Number of sizes is not the same as blockCount")
-        require(count == blockStarts.length, "Number of starts is not the same as blockCount")
+        require(count == blockSizes.length,
+                "Number of sizes is not the same as blockCount")
+        require(count == blockStarts.length,
+                "Number of starts is not the same as blockCount")
       case _ =>
     }
     this
   }
 
   def toSamInterval: Interval = (name, strand) match {
-    case (Some(name), Some(strand)) => new Interval(chr, start + 1, end, !strand, name)
+    case (Some(name), Some(strand)) =>
+      new Interval(chr, start + 1, end, !strand, name)
     case (Some(name), _) => new Interval(chr, start + 1, end, false, name)
     case _ => new Interval(chr, start + 1, end)
   }
@@ -173,17 +182,29 @@ object BedRecord {
       values.lift(5).map {
         case "-" => false
         case "+" => true
-        case _ => throw new IllegalStateException("Strand (column 6) must be '+' or '-'")
+        case _ =>
+          throw new IllegalStateException(
+            "Strand (column 6) must be '+' or '-'")
       },
       values.lift(6).map(_.toInt),
       values.lift(7) map (_.toInt),
       values
         .lift(8)
         .map(_.split(",", 3).map(_.toInt))
-        .map(x => (x.headOption.getOrElse(0), x.lift(1).getOrElse(0), x.lift(2).getOrElse(0))),
+        .map(
+          x =>
+            (x.headOption.getOrElse(0),
+             x.lift(1).getOrElse(0),
+             x.lift(2).getOrElse(0))),
       values.lift(9).map(_.toInt),
-      values.lift(10).map(_.split(",").map(_.toInt).toIndexedSeq).getOrElse(IndexedSeq()),
-      values.lift(11).map(_.split(",").map(_.toInt).toIndexedSeq).getOrElse(IndexedSeq())
+      values
+        .lift(10)
+        .map(_.split(",").map(_.toInt).toIndexedSeq)
+        .getOrElse(IndexedSeq()),
+      values
+        .lift(11)
+        .map(_.split(",").map(_.toInt).toIndexedSeq)
+        .getOrElse(IndexedSeq())
     )
   }
 }

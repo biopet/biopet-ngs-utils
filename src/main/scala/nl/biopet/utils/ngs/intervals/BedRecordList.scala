@@ -30,20 +30,23 @@ import nl.biopet.utils.Logging
 /**
   * Created by pjvan_thof on 8/20/15.
   */
-case class BedRecordList(chrRecords: Map[String, List[BedRecord]], header: List[String] = Nil) {
+case class BedRecordList(chrRecords: Map[String, List[BedRecord]],
+                         header: List[String] = Nil) {
   def allRecords: immutable.Iterable[BedRecord] =
     for (chr <- chrRecords; record <- chr._2) yield record
 
-  def toSamIntervals: immutable.Iterable[Interval] = allRecords.map(_.toSamInterval)
+  def toSamIntervals: immutable.Iterable[Interval] =
+    allRecords.map(_.toSamInterval)
 
   lazy val sorted: BedRecordList = {
     val sorted = new BedRecordList(
       chrRecords.map(x => x._1 -> x._2.sortWith((a, b) => a.start < b.start)))
-    if (sorted.chrRecords.forall(x => x._2 == chrRecords(x._1))) this else sorted
+    if (sorted.chrRecords.forall(x => x._2 == chrRecords(x._1))) this
+    else sorted
   }
 
-  lazy val isSorted: Boolean = sorted.hashCode() == this.hashCode() || sorted.chrRecords.forall(
-    x => x._2 == chrRecords(x._1))
+  lazy val isSorted: Boolean = sorted.hashCode() == this
+    .hashCode() || sorted.chrRecords.forall(x => x._2 == chrRecords(x._1))
 
   def overlapWith(record: BedRecord): List[BedRecord] =
     sorted.chrRecords
@@ -53,7 +56,8 @@ case class BedRecordList(chrRecords: Map[String, List[BedRecord]], header: List[
 
   def length: Long = allRecords.foldLeft(0L)((a, b) => a + b.length)
 
-  def squishBed(strandSensitive: Boolean = true, nameSensitive: Boolean = true): BedRecordList =
+  def squishBed(strandSensitive: Boolean = true,
+                nameSensitive: Boolean = true): BedRecordList =
     BedRecordList.fromList {
       (for ((_, records) <- sorted.chrRecords; record <- records) yield {
         val overlaps = overlapWith(record)
@@ -92,14 +96,19 @@ case class BedRecordList(chrRecords: Map[String, List[BedRecord]], header: List[
           chr -> {
             def combineOverlap(
                 records: List[BedRecord],
-                newRecords: ListBuffer[BedRecord] = ListBuffer()): List[BedRecord] = {
+                newRecords: ListBuffer[BedRecord] = ListBuffer())
+              : List[BedRecord] = {
               if (records.nonEmpty) {
                 val chr = records.head.chr
                 val start = records.head.start
-                val overlapRecords = records.takeWhile(_.start <= records.head.end)
+                val overlapRecords =
+                  records.takeWhile(_.start <= records.head.end)
                 val end = overlapRecords.map(_.end).max
 
-                newRecords += BedRecord(chr, start, end, _originals = overlapRecords)
+                newRecords += BedRecord(chr,
+                                        start,
+                                        end,
+                                        _originals = overlapRecords)
                 combineOverlap(records.drop(overlapRecords.length), newRecords)
               } else newRecords.toList
             }
@@ -107,9 +116,10 @@ case class BedRecordList(chrRecords: Map[String, List[BedRecord]], header: List[
           })
   }
 
-  def scatter(binSize: Int,
-              combineContigs: Boolean = true,
-              maxContigsInSingleJob: Option[Int] = None): List[List[BedRecord]] = {
+  def scatter(
+      binSize: Int,
+      combineContigs: Boolean = true,
+      maxContigsInSingleJob: Option[Int] = None): List[List[BedRecord]] = {
     val list = allRecords
       .flatMap(_.scatter(binSize))
       .toList
@@ -123,7 +133,8 @@ case class BedRecordList(chrRecords: Map[String, List[BedRecord]], header: List[
             if (!combineContigs && buffer.head.chr != record.chr)
               (buffer :: finalList, List(record))
             else if (bufferSize < (binSize / 2) &&
-                     buffer.size < maxContigsInSingleJob.getOrElse(Int.MaxValue))
+                     buffer.size < maxContigsInSingleJob.getOrElse(
+                       Int.MaxValue))
               (finalList, record :: buffer)
             else (buffer :: finalList, List(record))
           }
@@ -133,10 +144,12 @@ case class BedRecordList(chrRecords: Map[String, List[BedRecord]], header: List[
 
   def validateContigs(reference: File): BedRecordList = {
     val dict = FastaUtils.getCachedDict(reference)
-    val notExisting = chrRecords.keys.filter(dict.getSequence(_) == null).toList
+    val notExisting =
+      chrRecords.keys.filter(dict.getSequence(_) == null).toList
     require(
       notExisting.isEmpty,
-      s"Contigs found in bed records but are not existing in reference: ${notExisting.mkString(",")}")
+      s"Contigs found in bed records but are not existing in reference: ${notExisting
+        .mkString(",")}")
     this
   }
 
@@ -159,11 +172,13 @@ case class BedRecordList(chrRecords: Map[String, List[BedRecord]], header: List[
     fractionOf(dict.getReferenceLength)
 
   /** This return the fraction of the regions comparing to a reference */
-  def fractionOfReference(file: File): Double = fractionOfReference(FastaUtils.getCachedDict(file))
+  def fractionOfReference(file: File): Double =
+    fractionOfReference(FastaUtils.getCachedDict(file))
 }
 
 object BedRecordList {
-  def fromListWithHeader(records: Traversable[BedRecord], header: List[String]): BedRecordList =
+  def fromListWithHeader(records: Traversable[BedRecord],
+                         header: List[String]): BedRecordList =
     fromListWithHeader(records.toIterator, header)
 
   def fromListWithHeader(records: TraversableOnce[BedRecord],
@@ -200,7 +215,8 @@ object BedRecordList {
     * @return
     */
   def fromFiles(bedFiles: Seq[File], combine: Boolean = false): BedRecordList = {
-    val list = bedFiles.foldLeft(empty)((a, b) => fromList(fromFile(b).allRecords ++ a.allRecords))
+    val list = bedFiles.foldLeft(empty)((a, b) =>
+      fromList(fromFile(b).allRecords ++ a.allRecords))
     if (combine) list.combineOverlap
     else list
   }
@@ -211,7 +227,8 @@ object BedRecordList {
   def fromFile(bedFile: File): BedRecordList = {
     val reader = Source.fromFile(bedFile)
     val all = reader.getLines().toList
-    val header = all.takeWhile(x => x.startsWith("browser") || x.startsWith("track"))
+    val header =
+      all.takeWhile(x => x.startsWith("browser") || x.startsWith("track"))
     var lineCount = header.length
     val content = all.drop(lineCount)
     try {
@@ -229,7 +246,8 @@ object BedRecordList {
     }
   }
 
-  def fromReference(file: File): BedRecordList = fromDict(FastaUtils.getCachedDict(file))
+  def fromReference(file: File): BedRecordList =
+    fromDict(FastaUtils.getCachedDict(file))
 
   def fromDict(dict: SAMSequenceDictionary): BedRecordList = {
     fromList(for (contig <- dict.getSequences) yield {

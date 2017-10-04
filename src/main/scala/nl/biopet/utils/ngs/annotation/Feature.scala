@@ -76,7 +76,8 @@ object Feature {
       case attributesGtfRegex(key, value) => key -> value
       case attributesGffRegex(key, value) => key -> value
       case _ =>
-        throw new IllegalArgumentException(s"Attribute it not correct formatted, gtf line: $line")
+        throw new IllegalArgumentException(
+          s"Attribute it not correct formatted, gtf line: $line")
     } toMap
 
     val score = values(5) match {
@@ -88,7 +89,8 @@ object Feature {
       case "." => None
       case s: String if s.length == 1 => Some(s.head)
       case s =>
-        throw new IllegalArgumentException(s"'$s' can not be parsed as frame, gtf line: $line")
+        throw new IllegalArgumentException(
+          s"'$s' can not be parsed as frame, gtf line: $line")
     }
 
     Feature(values(0),
