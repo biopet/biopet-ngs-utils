@@ -5,10 +5,10 @@ scalaVersion := "2.11.11"
 
 resolvers += Resolver.sonatypeRepo("snapshots")
 
-libraryDependencies += "com.github.biopet" %% "biopet-common-utils" % "0.1.0-SNAPSHOT"
+libraryDependencies += "com.github.biopet" %% "biopet-common-utils" % "0.1.0-SNAPSHOT" changing()
 libraryDependencies += "com.github.samtools" % "htsjdk" % "2.11.0"
 
-libraryDependencies += "com.github.biopet" %% "biopet-test-utils" % "0.1.0-SNAPSHOT" % Test
+libraryDependencies += "com.github.biopet" %% "biopet-test-utils" % "0.1.0-SNAPSHOT" % Test changing()
 libraryDependencies += "org.mockito" % "mockito-all" % "1.9.5" % Test
 
 useGpg := true
