@@ -19,6 +19,7 @@ import java.util
 
 import htsjdk.variant.variantcontext.{Allele, Genotype, VariantContext}
 import htsjdk.variant.vcf.{VCFFileReader, VCFHeader}
+import nl.biopet.utils.ngs.intervals.BedRecord
 
 import scala.collection.JavaConversions._
 
@@ -171,5 +172,19 @@ object VcfUtils {
 
       alleleOverlap(g1.tail, g2tail, if (found) start + 1 else start)
     }
+  }
+
+  /**
+    * Read all records of a single regions
+    * @param inputFile input vcf file
+    * @param region Region to fetch
+    * @return Vcf records
+    */
+  def loadRegion(inputFile: File,
+                 region: BedRecord): Seq[VariantContext] = {
+    val reader = new VCFFileReader(inputFile, false)
+    val records = reader.query(region.chr, region.start, region.end).toList
+    reader.close()
+    records
   }
 }
