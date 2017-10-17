@@ -16,7 +16,7 @@ package nl.biopet.utils.ngs.intervals
 
 import htsjdk.samtools.reference.IndexedFastaSequenceFile
 import htsjdk.samtools.util.Interval
-import nl.biopet.utils.ngs.FastaUtils
+import nl.biopet.utils.ngs.fasta
 
 import scala.collection.immutable
 import scala.collection.mutable.ListBuffer
@@ -67,7 +67,7 @@ case class BedRecord(
   }
 
   def getGc(referenceFile: IndexedFastaSequenceFile): Double = {
-    FastaUtils.getSequenceGc(referenceFile, chr, start, end)
+    fasta.getSequenceGc(referenceFile, chr, start, end)
   }
 
   lazy val exons: Option[immutable.IndexedSeq[BedRecord]] =

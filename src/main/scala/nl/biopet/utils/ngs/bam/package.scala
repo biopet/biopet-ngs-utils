@@ -1,37 +1,16 @@
-/**
-  * Biopet is built on top of GATK Queue for building bioinformatic
-  * pipelines. It is mainly intended to support LUMC SHARK cluster which is running
-  * SGE. But other types of HPC that are supported by GATK Queue (such as PBS)
-  * should also be able to execute Biopet tools and pipelines.
-  *
-  * Copyright 2014 Sequencing Analysis Support Core - Leiden University Medical Center
-  *
-  * Contact us at: sasc@lumc.nl
-  *
-  * A dual licensing mode is applied. The source code within this project is freely available for non-commercial use under an AGPL
-  * license; For commercial users or users who do not want to follow the AGPL
-  * license, please contact us to obtain a separate license.
-  */
 package nl.biopet.utils.ngs
 
 import java.io.File
 
-import htsjdk.samtools.{
-  SAMReadGroupRecord,
-  SAMSequenceDictionary,
-  SamReader,
-  SamReaderFactory
-}
+import htsjdk.samtools.{SAMReadGroupRecord, SAMSequenceDictionary, SamReader, SamReaderFactory}
 import nl.biopet.utils.ngs.intervals.{BedRecord, BedRecordList}
 
-import scala.collection.JavaConversions._
 import scala.collection.mutable
 import scala.collection.parallel.immutable
 
-/**
-  * Created by pjvan_thof on 11/19/15.
-  */
-object BamUtils {
+import scala.collection.JavaConversions._
+
+package object bam {
 
   /**
     * This method will convert a list of bam files to a Map[<sampleName>, <bamFile>]
@@ -174,7 +153,7 @@ object BamUtils {
     val bamInsertSizes =
       inputSam.getFileHeader.getSequenceDictionary.getSequences.par
         .map({ contig =>
-          BamUtils.contigInsertSize(bamFile,
+          bam.contigInsertSize(bamFile,
                                     contig.getSequenceName,
                                     1,
                                     contig.getSequenceLength,
@@ -230,4 +209,5 @@ object BamUtils {
       } else samDicts.assertSameDictionary(that)
     }
   }
+
 }

@@ -24,7 +24,7 @@ class FastaUtilsTest extends TestNGSuite with Matchers {
 
     val referenceFile = new File(resourcePath("/fake_chrQ.fa"))
 
-    val map = FastaUtils.rebuildContigMap(inputFile, referenceFile)
+    val map = fasta.rebuildContigMap(inputFile, referenceFile)
 
     map shouldBe Map("chrQ" -> Set("chrT"))
   }
@@ -38,7 +38,7 @@ class FastaUtilsTest extends TestNGSuite with Matchers {
     writer.println("chrT\tchrQ")
     writer.close()
 
-    val map = FastaUtils.readContigMapReverse(inputFile)
+    val map = fasta.readContigMapReverse(inputFile)
 
     map shouldBe Map("chrQ" -> "chrT")
   }
@@ -47,7 +47,7 @@ class FastaUtilsTest extends TestNGSuite with Matchers {
   def testGetSequenceGc(): Unit = {
     val referenceFile = new File(resourcePath("/fake_chrQ.fa"))
 
-    FastaUtils.getSequenceGc(referenceFile, "chrQ", 11, 20) shouldBe 0.4
+    fasta.getSequenceGc(referenceFile, "chrQ", 11, 20) shouldBe 0.4
   }
 
   @Test
@@ -60,7 +60,7 @@ class FastaUtilsTest extends TestNGSuite with Matchers {
     writer.println("chrX\t")
     writer.close()
 
-    val map = FastaUtils.readContigMap(inputFile)
+    val map = fasta.readContigMap(inputFile)
 
     map shouldBe Map("chrT" -> Set("chrQ"), "chrX" -> Set())
   }

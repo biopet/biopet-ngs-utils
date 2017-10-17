@@ -1,17 +1,3 @@
-/**
-  * Biopet is built on top of GATK Queue for building bioinformatic
-  * pipelines. It is mainly intended to support LUMC SHARK cluster which is running
-  * SGE. But other types of HPC that are supported by GATK Queue (such as PBS)
-  * should also be able to execute Biopet tools and pipelines.
-  *
-  * Copyright 2014 Sequencing Analysis Support Core - Leiden University Medical Center
-  *
-  * Contact us at: sasc@lumc.nl
-  *
-  * A dual licensing mode is applied. The source code within this project is freely available for non-commercial use under an AGPL
-  * license; For commercial users or users who do not want to follow the AGPL
-  * license, please contact us to obtain a separate license.
-  */
 package nl.biopet.utils.ngs
 
 import java.io.File
@@ -23,8 +9,7 @@ import nl.biopet.utils.ngs.intervals.BedRecord
 
 import scala.collection.JavaConversions._
 
-/** Utility object for general vcf file/records functions. */
-object VcfUtils {
+package object vcf {
 
   /**
     * Return longest allele of VariantContext.
@@ -60,7 +45,7 @@ object VcfUtils {
     * @return converted java ArrayList[Object]
     */
   def scalaListToJavaObjectArrayList(
-      array: List[Any]): util.ArrayList[Object] = {
+                                      array: List[Any]): util.ArrayList[Object] = {
     val out = new util.ArrayList[Object]()
 
     array.foreach {
@@ -82,9 +67,9 @@ object VcfUtils {
   def identicalVariantContext(var1: VariantContext,
                               var2: VariantContext): Boolean = {
     var1.getContig == var2.getContig &&
-    var1.getStart == var2.getStart &&
-    var1.getEnd == var2.getEnd &&
-    var1.getAttributes == var2.getAttributes
+      var1.getStart == var2.getStart &&
+      var1.getEnd == var2.getEnd &&
+      var1.getAttributes == var2.getAttributes
   }
 
   /**
@@ -187,4 +172,5 @@ object VcfUtils {
     reader.close()
     records
   }
+
 }

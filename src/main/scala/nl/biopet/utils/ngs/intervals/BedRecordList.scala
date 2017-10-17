@@ -19,7 +19,7 @@ import java.io.{File, PrintWriter}
 import htsjdk.samtools.SAMSequenceDictionary
 import htsjdk.samtools.reference.IndexedFastaSequenceFile
 import htsjdk.samtools.util.Interval
-import nl.biopet.utils.ngs.FastaUtils
+import nl.biopet.utils.ngs.fasta
 
 import scala.collection.JavaConversions._
 import scala.collection.{immutable, mutable}
@@ -143,7 +143,7 @@ case class BedRecordList(chrRecords: Map[String, List[BedRecord]],
   }
 
   def validateContigs(reference: File): BedRecordList = {
-    val dict = FastaUtils.getCachedDict(reference)
+    val dict = fasta.getCachedDict(reference)
     val notExisting =
       chrRecords.keys.filter(dict.getSequence(_) == null).toList
     require(
@@ -173,7 +173,7 @@ case class BedRecordList(chrRecords: Map[String, List[BedRecord]],
 
   /** This return the fraction of the regions comparing to a reference */
   def fractionOfReference(file: File): Double =
-    fractionOfReference(FastaUtils.getCachedDict(file))
+    fractionOfReference(fasta.getCachedDict(file))
 }
 
 object BedRecordList {
@@ -247,7 +247,7 @@ object BedRecordList {
   }
 
   def fromReference(file: File): BedRecordList =
-    fromDict(FastaUtils.getCachedDict(file))
+    fromDict(fasta.getCachedDict(file))
 
   def fromDict(dict: SAMSequenceDictionary): BedRecordList = {
     fromList(for (contig <- dict.getSequences) yield {
