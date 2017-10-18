@@ -169,14 +169,26 @@ package object vcf {
     val reader = new VCFFileReader(inputFile, true)
     val records = loadRegion(reader, region)
     reader.close()
-    records
+    records.toSeq
   }
 
+  /**
+    * Returns a iterator for records from region
+    * @param reader reader to use
+    * @param region Region to fetch
+    * @return
+    */
   def loadRegion(reader: VCFFileReader,
-                 region: BedRecord): Seq[VariantContext] = {
-    reader.query(region.chr, region.start, region.end).toList
+                 region: BedRecord): Iterator[VariantContext] = {
+    reader.query(region.chr, region.start, region.end)
   }
 
+  /**
+    * This method will return multiple region as a single iterator
+    * @param inputFile input vcf file
+    * @param regions regions to fetch
+    * @return
+    */
   def loadRegions(inputFile: File, regions: Iterator[BedRecord]): Iterator[VariantContext] = {
     new Iterator[VariantContext] with AutoCloseable {
       private val reader = new VCFFileReader(inputFile, true)
