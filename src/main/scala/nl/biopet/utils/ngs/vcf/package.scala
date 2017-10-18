@@ -166,10 +166,25 @@ package object vcf {
     */
   def loadRegion(inputFile: File,
                  region: BedRecord): Seq[VariantContext] = {
-    val reader = new VCFFileReader(inputFile, false)
-    val records = reader.query(region.chr, region.start, region.end).toList
+    val reader = new VCFFileReader(inputFile, true)
+    val records = loadRegion(reader, region)
     reader.close()
     records
   }
 
+  def loadRegion(reader: VCFFileReader,
+                 region: BedRecord): Seq[VariantContext] = {
+    reader.query(region.chr, region.start, region.end).toList
+  }
+
+  def loadRegions(inputFile: File, regions: Iterator[BedRecord]): Iterator[VariantContext] = {
+    new Iterator[VariantContext] with AutoCloseable {
+      private val reader = new VCFFileReader(inputFile, true)
+      private val it = regions.flatMap(loadRegion(reader, _))
+
+      def hasNext: Boolean = it.hasNext
+      def next(): VariantContext = it.next()
+      def close(): Unit = reader.close()
+    }
+  }
 }
