@@ -12,7 +12,7 @@
   * license; For commercial users or users who do not want to follow the AGPL
   * license, please contact us to obtain a separate license.
   */
-package nl.biopet.utils.ngs
+package nl.biopet.utils.ngs.bam
 
 import java.io.File
 

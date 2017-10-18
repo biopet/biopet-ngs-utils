@@ -12,7 +12,7 @@
   * license; For commercial users or users who do not want to follow the AGPL
   * license, please contact us to obtain a separate license.
   */
-package nl.biopet.utils.ngs
+package nl.biopet.utils.ngs.vcf
 
 import htsjdk.variant.variantcontext.{Allele, GenotypeBuilder}
 import org.scalatest.Matchers
@@ -25,8 +25,6 @@ import scala.collection.JavaConversions._
   * Created by Sander Bollen on 4-10-16.
   */
 class VcfUtilsTest extends TestNGSuite with Matchers {
-
-  import nl.biopet.utils.ngs.vcf._
   
   @Test
   def testCompoundNoCall(): Unit = {

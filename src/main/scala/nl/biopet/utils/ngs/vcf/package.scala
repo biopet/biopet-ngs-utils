@@ -44,8 +44,7 @@ package object vcf {
     * @param array scala List[Any]
     * @return converted java ArrayList[Object]
     */
-  def scalaListToJavaObjectArrayList(
-                                      array: List[Any]): util.ArrayList[Object] = {
+  def scalaListToJavaObjectArrayList(array: List[Any]): util.ArrayList[Object] = {
     val out = new util.ArrayList[Object]()
 
     array.foreach {

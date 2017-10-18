@@ -1,8 +1,9 @@
-package nl.biopet.utils.ngs
+package nl.biopet.utils.ngs.fasta
 
 import java.io.{File, PrintWriter}
 import java.nio.file.Paths
 
+import nl.biopet.utils.ngs.fasta
 import org.scalatest.Matchers
 import org.scalatest.testng.TestNGSuite
 import org.testng.annotations.Test
