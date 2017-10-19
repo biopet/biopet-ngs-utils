@@ -194,7 +194,8 @@ package object vcf {
     */
   def loadRegion(reader: VCFFileReader,
                  region: BedRecord): Iterator[VariantContext] = {
-    reader.query(region.chr, region.start, region.end)
+    val interval = region.toSamInterval
+    reader.query(region.chr, interval.getStart, interval.getEnd)
   }
 
   /**
