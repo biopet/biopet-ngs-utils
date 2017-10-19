@@ -158,6 +158,20 @@ package object vcf {
     }
   }
 
+  /** Give back the number of alleles that overlap */
+  def alleleIndexOverlap(g1: List[Int], g2: List[Int], start: Int = 0): Int = {
+    if (g1.isEmpty) start
+    else {
+      val found = g2.contains(g1.head)
+      val g2tail = if (found) {
+        val index = g2.indexOf(g1.head)
+        g2.drop(index + 1) ++ g2.take(index)
+      } else g2
+
+      alleleIndexOverlap(g1.tail, g2tail, if (found) start + 1 else start)
+    }
+  }
+
   /**
     * Read all records of a single regions
     * @param inputFile input vcf file
