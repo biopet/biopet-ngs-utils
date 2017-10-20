@@ -13,7 +13,7 @@ import scala.language.implicitConversions
 /**
   * This class will collect general stats from vcf records
   */
-class GenotypeStats(header: VCFHeader) {
+class GenotypeStats(header: VCFHeader) extends Serializable {
 
   /** This map binds names to sample index */
   val samples: Map[String, Int] = header.getSampleNameToOffset.toMap.map(x => x._1 -> x._2.toInt)

@@ -10,7 +10,7 @@ import scala.language.implicitConversions
 /**
   * This class will collect general stats from vcf records
   */
-class GeneralStats {
+class GeneralStats extends Serializable {
   /** Counts object to store results */
   protected[GeneralStats] val counts =
     new Counts[GeneralStats.Value](GeneralStats.values.map(_ -> 0L).toMap)
