@@ -31,7 +31,7 @@ class GenotypeStats(header: VCFHeader) extends Serializable {
   }
 
   /** Write results to a file */
-  def writeHistogramToTsv(file: File): Unit = {
+  def writeToTsv(file: File): Unit = {
     val writer = new PrintWriter(file)
     val sorted = samples.toList.sortBy(_._1)
     writer.println(sorted.map(_._1).mkString("Sample\t", "\t", ""))

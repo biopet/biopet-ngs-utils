@@ -21,7 +21,7 @@ class GeneralStats extends Serializable {
   }
 
   /** Write results to a file */
-  def writeHistogramToTsv(file: File): Unit = counts.writeHistogramToTsv(file)
+  def writeToTsv(file: File): Unit = counts.writeHistogramToTsv(file)
 
   /** Convert to immutable Map */
   def toMap: Map[GeneralStats.Value, Long] = counts.countsMap
