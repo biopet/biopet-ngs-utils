@@ -24,7 +24,7 @@ class GenotypeStatsTest extends BiopetTest {
     map("Sample_1")(GenotypeStats.Filtered) shouldBe 0L
 
     val tempDir = Files.createTempDirectory("sampleCompare").toFile
-    stats.writeHistogramToTsv(new File(tempDir, "genotype.tsv"))
+    stats.writeToTsv(new File(tempDir, "genotype.tsv"))
     val lines = Source.fromFile(new File(tempDir, "genotype.tsv")).getLines().toList
     lines.head shouldBe stats.samples.keys.toList.sorted.mkString("Sample\t", "\t", "")
     lines.map(_.split("\t")).map(_.length).distinct shouldBe List(4)
@@ -48,7 +48,7 @@ class GenotypeStatsTest extends BiopetTest {
     map("Sample_1")(GenotypeStats.Filtered) shouldBe 0L
 
     val tempDir = Files.createTempDirectory("sampleCompare").toFile
-    stats.writeHistogramToTsv(new File(tempDir, "genotype.tsv"))
+    stats.writeToTsv(new File(tempDir, "genotype.tsv"))
     val lines = Source.fromFile(new File(tempDir, "genotype.tsv")).getLines().toList
     lines.head shouldBe stats.samples.keys.toList.sorted.mkString("Sample\t", "\t", "")
     lines.map(_.split("\t")).map(_.length).distinct shouldBe List(4)

@@ -25,7 +25,7 @@ class GeneralStatsTest extends BiopetTest {
     map(GeneralStats.MonomorphicInSamples) shouldBe 1L
 
     val tempDir = Files.createTempDirectory("sampleCompare").toFile
-    stats.writeHistogramToTsv(new File(tempDir, "general.tsv"))
+    stats.writeToTsv(new File(tempDir, "general.tsv"))
     val lines = Source.fromFile(new File(tempDir, "general.tsv")).getLines().toList
     lines.map(_.split("\t")).map(_.length).distinct shouldBe List(2)
     lines.head shouldBe "value\tcount"
@@ -50,7 +50,7 @@ class GeneralStatsTest extends BiopetTest {
     map(GeneralStats.MonomorphicInSamples) shouldBe 2L
 
     val tempDir = Files.createTempDirectory("sampleCompare").toFile
-    stats.writeHistogramToTsv(new File(tempDir, "general.tsv"))
+    stats.writeToTsv(new File(tempDir, "general.tsv"))
     val lines = Source.fromFile(new File(tempDir, "general.tsv")).getLines().toList
     lines.map(_.split("\t")).map(_.length).distinct shouldBe List(2)
     lines.head shouldBe "value\tcount"
