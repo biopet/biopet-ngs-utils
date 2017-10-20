@@ -20,7 +20,7 @@ class GenotypeStats(header: VCFHeader) {
 
   /** Counts object to store results */
   protected[GenotypeStats] val counts: Map[Int, Counts[vcf.GenotypeStats.Value]] =
-    samples.values.map(_  -> new Counts[GenotypeStats.Value]).toMap
+    samples.values.map(_  -> new Counts[GenotypeStats.Value](GenotypeStats.values.map(_ -> 0L).toMap)).toMap
 
   /** Adding a [[VariantContext]] to the counts */
   def addRecord(record: VariantContext): Unit = {
@@ -36,8 +36,8 @@ class GenotypeStats(header: VCFHeader) {
     val sorted = samples.toList.sortBy(_._1)
     writer.println(sorted.map(_._1).mkString("Sample\t", "\t", ""))
     for (method <- GenotypeStats.values) {
-      print(method + "\t")
-      println(sorted.map(x => counts(x._2).get(method)).mkString("\t"))
+      writer.print(method + "\t")
+      writer.println(sorted.map(x => counts(x._2).get(method).getOrElse(0L)).mkString("\t"))
     }
     writer.close()
   }

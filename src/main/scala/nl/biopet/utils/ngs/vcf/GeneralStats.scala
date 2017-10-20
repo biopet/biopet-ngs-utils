@@ -12,7 +12,8 @@ import scala.language.implicitConversions
   */
 class GeneralStats {
   /** Counts object to store results */
-  protected[GeneralStats] val counts = new Counts[GeneralStats.Value]
+  protected[GeneralStats] val counts =
+    new Counts[GeneralStats.Value](GeneralStats.values.map(_ -> 0L).toMap)
 
   /** Adding a [[VariantContext]] to the counts */
   def addRecord(record: VariantContext): Unit = {
