@@ -33,4 +33,28 @@ class GenotypeStatsTest extends BiopetTest {
     )
   }
 
+  @Test
+  def testCombine(): Unit = {
+    val reader = new VCFFileReader(resourceFile("/multi.vcf"), false)
+    val stats = new GenotypeStats(reader.getFileHeader)
+
+    reader.foreach(stats.addRecord)
+    reader.close()
+
+    stats += stats
+
+    val map = stats.toMap
+    map("Sample_1")(GenotypeStats.Total) shouldBe 8L
+    map("Sample_1")(GenotypeStats.Filtered) shouldBe 0L
+
+    val tempDir = Files.createTempDirectory("sampleCompare").toFile
+    stats.writeHistogramToTsv(new File(tempDir, "genotype.tsv"))
+    val lines = Source.fromFile(new File(tempDir, "genotype.tsv")).getLines().toList
+    lines.head shouldBe stats.samples.keys.toList.sorted.mkString("Sample\t", "\t", "")
+    lines.map(_.split("\t")).map(_.length).distinct shouldBe List(4)
+    GenotypeStats.values.foreach(s =>
+      require(lines.exists(_.startsWith(s.toString + "\t")), s"$s not found")
+    )
+  }
+
 }
