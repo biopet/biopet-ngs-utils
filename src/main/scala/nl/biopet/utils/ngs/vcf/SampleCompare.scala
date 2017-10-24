@@ -106,7 +106,7 @@ class SampleCompare(header: VCFHeader) extends Serializable {
     * @param outputDir Directory to write to
     */
   def writeAllFiles(outputDir: File): Unit = {
-    require(outputDir.exists(), s"$outputDir doe not exist")
+    require(outputDir.exists(), s"$outputDir does not exist")
     require(outputDir.isDirectory, s"$outputDir is not a directory")
 
     writeAlleleOverlap(new File(outputDir, "allele.abs.tsv"))
