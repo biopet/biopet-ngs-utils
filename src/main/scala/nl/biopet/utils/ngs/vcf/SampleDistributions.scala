@@ -30,6 +30,7 @@ class SampleDistributions extends Serializable {
     }
   }
 
+  /** Combine with an other [[SampleDistributions]] */
   def +=(other: SampleDistributions): SampleDistributions = {
     GenotypeStats.values.foreach(x => this.counts(x) += other.counts(x))
     this
