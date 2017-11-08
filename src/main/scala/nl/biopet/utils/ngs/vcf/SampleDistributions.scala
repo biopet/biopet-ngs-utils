@@ -10,8 +10,9 @@ import scala.collection.JavaConversions._
 class SampleDistributions extends Serializable {
 
   /** Counts object to store results */
-  protected[SampleDistributions] val counts: Map[GenotypeStats.Value, Histogram[Int]] =
-    GenotypeStats.values.map(_  -> new Histogram[Int]).toMap
+  protected[SampleDistributions] val counts
+    : Map[GenotypeStats.Value, Histogram[Int]] =
+    GenotypeStats.values.map(_ -> new Histogram[Int]).toMap
 
   def addRecord(record: VariantContext): Unit = {
     GenotypeStats.values.foreach { x =>
@@ -20,7 +21,8 @@ class SampleDistributions extends Serializable {
   }
 
   /** Convert to immutable Map */
-  def toMap: Map[GenotypeStats.Value, Map[Int, Long]] = counts.map(x => x._1 -> x._2.countsMap)
+  def toMap: Map[GenotypeStats.Value, Map[Int, Long]] =
+    counts.map(x => x._1 -> x._2.countsMap)
 
   /** Write results to a directory */
   def writeToDir(outputDir: File): Unit = {

@@ -16,11 +16,17 @@ import scala.language.implicitConversions
 class GenotypeStats(header: VCFHeader) extends Serializable {
 
   /** This map binds names to sample index */
-  val samples: Map[String, Int] = header.getSampleNameToOffset.toMap.map(x => x._1 -> x._2.toInt)
+  val samples: Map[String, Int] =
+    header.getSampleNameToOffset.toMap.map(x => x._1 -> x._2.toInt)
 
   /** Counts object to store results */
-  protected[GenotypeStats] val counts: Map[Int, Counts[vcf.GenotypeStats.Value]] =
-    samples.values.map(_  -> new Counts[GenotypeStats.Value](GenotypeStats.values.map(_ -> 0L).toMap)).toMap
+  protected[GenotypeStats] val counts
+    : Map[Int, Counts[vcf.GenotypeStats.Value]] =
+    samples.values
+      .map(
+        _ -> new Counts[GenotypeStats.Value](
+          GenotypeStats.values.map(_ -> 0L).toMap))
+      .toMap
 
   /** Adding a [[VariantContext]] to the counts */
   def addRecord(record: VariantContext): Unit = {
@@ -37,13 +43,15 @@ class GenotypeStats(header: VCFHeader) extends Serializable {
     writer.println(sorted.map(_._1).mkString("Sample\t", "\t", ""))
     for (method <- GenotypeStats.values) {
       writer.print(method + "\t")
-      writer.println(sorted.map(x => counts(x._2).get(method).getOrElse(0L)).mkString("\t"))
+      writer.println(
+        sorted.map(x => counts(x._2).get(method).getOrElse(0L)).mkString("\t"))
     }
     writer.close()
   }
 
   /** Convert to immutable Map */
-  def toMap: Map[String, Map[GenotypeStats.Value, Long]] = samples.map(x => x._1 -> counts(x._2).countsMap)
+  def toMap: Map[String, Map[GenotypeStats.Value, Long]] =
+    samples.map(x => x._1 -> counts(x._2).countsMap)
 
   /** Combine multiple classes into 1 */
   def +=(other: GenotypeStats): GenotypeStats = {
@@ -59,12 +67,12 @@ object GenotypeStats extends Enumeration {
   implicit def valueToVal(x: Value): Val = x.asInstanceOf[Val]
 
   val Total = Val(_ => true)
-  val Het   = Val(_.isHet)
-  val HetNonRef   = Val(_.isHetNonRef)
-  val Hom    = Val(_.isHom)
+  val Het = Val(_.isHet)
+  val HetNonRef = Val(_.isHetNonRef)
+  val Hom = Val(_.isHom)
   val HomRef = Val(_.isHomRef)
-  val HomVar  = Val(_.isHomVar)
-  val Mixed  = Val(_.isMixed)
+  val HomVar = Val(_.isHomVar)
+  val Mixed = Val(_.isMixed)
   val NoCall = Val(_.isNoCall)
   val NonInformative = Val(_.isNonInformative)
   val Available = Val(_.isAvailable)

@@ -44,7 +44,8 @@ package object vcf {
     * @param array scala List[Any]
     * @return converted java ArrayList[Object]
     */
-  def scalaListToJavaObjectArrayList(array: List[Any]): util.ArrayList[Object] = {
+  def scalaListToJavaObjectArrayList(
+      array: List[Any]): util.ArrayList[Object] = {
     val out = new util.ArrayList[Object]()
 
     array.foreach {
@@ -66,9 +67,9 @@ package object vcf {
   def identicalVariantContext(var1: VariantContext,
                               var2: VariantContext): Boolean = {
     var1.getContig == var2.getContig &&
-      var1.getStart == var2.getStart &&
-      var1.getEnd == var2.getEnd &&
-      var1.getAttributes == var2.getAttributes
+    var1.getStart == var2.getStart &&
+    var1.getEnd == var2.getEnd &&
+    var1.getAttributes == var2.getAttributes
   }
 
   /**
@@ -178,8 +179,7 @@ package object vcf {
     * @param region Region to fetch
     * @return Vcf records
     */
-  def loadRegion(inputFile: File,
-                 region: BedRecord): Seq[VariantContext] = {
+  def loadRegion(inputFile: File, region: BedRecord): Seq[VariantContext] = {
     val reader = new VCFFileReader(inputFile, true)
     val records = loadRegion(reader, region)
     reader.close()
@@ -204,7 +204,8 @@ package object vcf {
     * @param regions regions to fetch
     * @return
     */
-  def loadRegions(inputFile: File, regions: Iterator[BedRecord]): Iterator[VariantContext] = {
+  def loadRegions(inputFile: File,
+                  regions: Iterator[BedRecord]): Iterator[VariantContext] = {
     new Iterator[VariantContext] with AutoCloseable {
       private val reader = new VCFFileReader(inputFile, true)
       private val it = regions.flatMap(loadRegion(reader, _))

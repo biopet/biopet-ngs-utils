@@ -11,6 +11,7 @@ import scala.language.implicitConversions
   * This class will collect general stats from vcf records
   */
 class GeneralStats extends Serializable {
+
   /** Counts object to store results */
   protected[GeneralStats] val counts =
     new Counts[GeneralStats.Value](GeneralStats.values.map(_ -> 0L).toMap)
@@ -39,12 +40,12 @@ object GeneralStats extends Enumeration {
   implicit def valueToVal(x: Value): Val = x.asInstanceOf[Val]
 
   val Total = Val(_ => true)
-  val Biallelic   = Val(_.isBiallelic)
-  val ComplexIndel   = Val(_.isComplexIndel)
-  val Filtered    = Val(_.isFiltered)
+  val Biallelic = Val(_.isBiallelic)
+  val ComplexIndel = Val(_.isComplexIndel)
+  val Filtered = Val(_.isFiltered)
   val FullyDecoded = Val(_.isFullyDecoded)
-  val Indel  = Val(_.isIndel)
-  val MNP  = Val(_.isMNP)
+  val Indel = Val(_.isIndel)
+  val MNP = Val(_.isMNP)
   val MonomorphicInSamples = Val(_.isMonomorphicInSamples)
   val NotFiltered = Val(_.isNotFiltered)
   val PointEvent = Val(_.isPointEvent)

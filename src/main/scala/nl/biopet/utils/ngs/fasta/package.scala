@@ -92,8 +92,8 @@ package object fasta {
   }
 
   def rebuildContigMap(
-                        contigMap: File,
-                        dict: SAMSequenceDictionary): Map[String, Set[String]] = {
+      contigMap: File,
+      dict: SAMSequenceDictionary): Map[String, Set[String]] = {
     val map = readContigMap(contigMap)
     (for (contig <- dict.getSequences) yield {
       val name = contig.getSequenceName
