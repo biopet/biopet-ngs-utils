@@ -26,9 +26,9 @@ package object vcf {
   def identicalVariantContext(var1: VariantContext,
                               var2: VariantContext): Boolean = {
     var1.getContig == var2.getContig &&
-      var1.getStart == var2.getStart &&
-      var1.getEnd == var2.getEnd &&
-      var1.getAttributes == var2.getAttributes
+    var1.getStart == var2.getStart &&
+    var1.getEnd == var2.getEnd &&
+    var1.getAttributes == var2.getAttributes
   }
 
   /**
@@ -112,8 +112,7 @@ package object vcf {
     * @param region Region to fetch
     * @return Vcf records
     */
-  def loadRegion(inputFile: File,
-                 region: BedRecord): Seq[VariantContext] = {
+  def loadRegion(inputFile: File, region: BedRecord): Seq[VariantContext] = {
     val reader = new VCFFileReader(inputFile, true)
     val records = loadRegion(reader, region)
     reader.close()
@@ -138,7 +137,8 @@ package object vcf {
     * @param regions regions to fetch
     * @return
     */
-  def loadRegions(inputFile: File, regions: Iterator[BedRecord]): Iterator[VariantContext] = {
+  def loadRegions(inputFile: File,
+                  regions: Iterator[BedRecord]): Iterator[VariantContext] = {
     new Iterator[VariantContext] with AutoCloseable {
       private val reader = new VCFFileReader(inputFile, true)
       private val it = regions.flatMap(loadRegion(reader, _))
@@ -150,16 +150,21 @@ package object vcf {
   }
 
   implicit class BiopetVariantContext(record: VariantContext) {
+
     /**
       * Look up a list of doubles in the info fields
       * @param key Key to look up in the info fields
       * @param method methods to apply on list, default returns all values
       * @return
       */
-    def getAttAsDouble(key: String, method: FieldMethod.Value = FieldMethod.All.asInstanceOf): List[Double] = {
-      val value = if (record.hasAttribute(key))
-        conversions.anyToDoubleList(Option(record.getAttribute(key)))
-      else Nil
+    def getAttAsDouble(
+        key: String,
+        method: FieldMethod.Value = FieldMethod.All.asInstanceOf)
+      : List[Double] = {
+      val value =
+        if (record.hasAttribute(key))
+          conversions.anyToDoubleList(Option(record.getAttribute(key)))
+        else Nil
       method.doubleMethod(value)
     }
 
@@ -169,10 +174,14 @@ package object vcf {
       * @param method methods to apply on list, default returns all values
       * @return
       */
-    def getAttAsString(key: String, method: FieldMethod.Value = FieldMethod.All.asInstanceOf): List[String] = {
-      val value = if (record.hasAttribute(key))
-        conversions.anyToStringList(Option(record.getAttribute(key)))
-      else Nil
+    def getAttAsString(
+        key: String,
+        method: FieldMethod.Value = FieldMethod.All.asInstanceOf)
+      : List[String] = {
+      val value =
+        if (record.hasAttribute(key))
+          conversions.anyToStringList(Option(record.getAttribute(key)))
+        else Nil
       method.stringMethod(value)
     }
 
@@ -190,16 +199,21 @@ package object vcf {
   }
 
   implicit class BiopetGenotype(genotype: Genotype) {
+
     /**
       * Look up a list of doubles in the genotype fields
       * @param key Key to look up in the genotype fields
       * @param method methods to apply on list, default returns all values
       * @return
       */
-    def getAttAsDouble(key: String, method: FieldMethod.Value = FieldMethod.All.asInstanceOf): List[Double] = {
-      val value = if (genotype.hasAnyAttribute(key))
-        conversions.anyToDoubleList(genotype.getAnyAttribute(key))
-      else Nil
+    def getAttAsDouble(
+        key: String,
+        method: FieldMethod.Value = FieldMethod.All.asInstanceOf)
+      : List[Double] = {
+      val value =
+        if (genotype.hasAnyAttribute(key))
+          conversions.anyToDoubleList(genotype.getAnyAttribute(key))
+        else Nil
       method.doubleMethod(value)
     }
 
@@ -209,10 +223,14 @@ package object vcf {
       * @param method methods to apply on list, default returns all values
       * @return
       */
-    def getAttAsString(key: String, method: FieldMethod.Value = FieldMethod.All.asInstanceOf): List[String] = {
-      val value = if (genotype.hasAnyAttribute(key))
-        conversions.anyToStringList(genotype.getAnyAttribute(key))
-      else Nil
+    def getAttAsString(
+        key: String,
+        method: FieldMethod.Value = FieldMethod.All.asInstanceOf)
+      : List[String] = {
+      val value =
+        if (genotype.hasAnyAttribute(key))
+          conversions.anyToStringList(genotype.getAnyAttribute(key))
+        else Nil
       method.stringMethod(value)
     }
 

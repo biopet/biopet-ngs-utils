@@ -6,7 +6,9 @@ import htsjdk.variant.variantcontext.VariantContext
 import htsjdk.variant.vcf.{VCFHeaderLineType, VCFInfoHeaderLine}
 import nl.biopet.utils.{Histogram, Logging}
 
-class InfoFieldHistogram(field: VCFInfoHeaderLine, method: FieldMethod.Value) extends Logging {
+class InfoFieldHistogram(field: VCFInfoHeaderLine, method: FieldMethod.Value)
+    extends Logging
+    with Serializable {
 
   if (field.getType != VCFHeaderLineType.Integer && field.getType != VCFHeaderLineType.Float)
     logger.warn(s"Info field ${field.getID} is of type Integer or Float. " +

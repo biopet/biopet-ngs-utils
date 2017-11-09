@@ -2,7 +2,12 @@ package nl.biopet.utils.ngs
 
 import java.io.File
 
-import htsjdk.samtools.{SAMReadGroupRecord, SAMSequenceDictionary, SamReader, SamReaderFactory}
+import htsjdk.samtools.{
+  SAMReadGroupRecord,
+  SAMSequenceDictionary,
+  SamReader,
+  SamReaderFactory
+}
 import nl.biopet.utils.ngs.intervals.{BedRecord, BedRecordList}
 
 import scala.collection.mutable
@@ -154,11 +159,11 @@ package object bam {
       inputSam.getFileHeader.getSequenceDictionary.getSequences.par
         .map({ contig =>
           bam.contigInsertSize(bamFile,
-                                    contig.getSequenceName,
-                                    1,
-                                    contig.getSequenceLength,
-                                    samplingSize,
-                                    binSize)
+                               contig.getSequenceName,
+                               1,
+                               contig.getSequenceLength,
+                               samplingSize,
+                               binSize)
         })
         .toList
     val counts = bamInsertSizes.flatten

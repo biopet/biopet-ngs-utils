@@ -6,7 +6,8 @@ import htsjdk.variant.variantcontext.VariantContext
 import htsjdk.variant.vcf.VCFInfoHeaderLine
 import nl.biopet.utils.{Counts, Histogram}
 
-class InfoFieldCounts(field: VCFInfoHeaderLine, method: FieldMethod.Value) {
+class InfoFieldCounts(field: VCFInfoHeaderLine, method: FieldMethod.Value)
+    extends Serializable {
 
   protected[InfoFieldCounts] val counts = new Counts[String]()
 
