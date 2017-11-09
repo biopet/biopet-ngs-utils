@@ -72,10 +72,14 @@ object Feature {
           s"strand only allows '+' or '-', not ${values(6)}, gtf line: $line")
     }
 
-    val attributes = values.lift(8)
+    val attributes = values
+      .lift(8)
       .map(_.split(";"))
       .getOrElse(Array())
-      .map(parseAttribute).toMap
+      .map(_.trim)
+      .filter(_.nonEmpty)
+      .map(parseAttribute)
+      .toMap
 
     val score = values(5) match {
       case "." => None

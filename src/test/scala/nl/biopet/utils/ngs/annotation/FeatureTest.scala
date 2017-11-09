@@ -16,5 +16,9 @@ class FeatureTest extends BiopetTest {
     feature.end shouldBe 14412
     feature.attributes("gene_id") shouldBe "ENSG00000223972.4"
     feature.attributes("level") shouldBe "2"
+
+    val line2 = "chr1\tHAVANA\tpseudo_polyA\t134957\t134962\t.\t-\t.\tgene_id \"540278\"; transcript_id \"540278\"; gene_type \"pseudo_polyA\"; gene_status \"NULL\"; gene_name \"540278\"; transcript_type \"pseudo_polyA\"; transcript_status \"NULL\"; transcript_name \"540278\"; level 2; "
+    val feature2 = Feature.fromLine(line2)
+
   }
 }
