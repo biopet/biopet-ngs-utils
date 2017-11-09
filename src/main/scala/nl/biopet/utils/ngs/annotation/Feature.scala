@@ -72,13 +72,10 @@ object Feature {
           s"strand only allows '+' or '-', not ${values(6)}, gtf line: $line")
     }
 
-    val attributes = values.lift(8).map(_.split(";")).getOrElse(Array()).map {
-      case attributesGtfRegex(key, value) => key -> value
-      case attributesGffRegex(key, value) => key -> value
-      case _ =>
-        throw new IllegalArgumentException(
-          s"Attribute it not correct formatted, gtf line: $line")
-    } toMap
+    val attributes = values.lift(8)
+      .map(_.split(";"))
+      .getOrElse(Array())
+      .map(parseAttribute).toMap
 
     val score = values(5) match {
       case "." => None
@@ -104,6 +101,18 @@ object Feature {
             attributes)
   }
 
-  lazy val attributesGtfRegex: Regex = """\s*(\S*) "(.*)"$""".r
+  def parseAttribute(att: String): (String, String) = {
+    att match {
+      case attributesGtfRegex(key, value) => key -> value
+      case attributesGffRegex(key, value) => key -> value
+      case x =>
+        val values = x.trim.split(" ")
+        require(values.length == 2, s"Attribute '$x' it not correct formatted")
+        values(0) -> values(1).stripSuffix("\'").stripPrefix("\"")
+
+    }
+  }
+
+  lazy val attributesGtfRegex: Regex = """\s*(\S*) "?(.*)"$""".r
   lazy val attributesGffRegex: Regex = """\s*(\S*)=(.*)$""".r
 }
