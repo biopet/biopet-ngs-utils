@@ -87,20 +87,27 @@ package object fasta {
   }
 
   def rebuildContigMap(contigMap: File,
-                       referenceFasta: File): Map[String, Set[String]] = {
-    rebuildContigMap(contigMap, getDictFromFasta(referenceFasta))
+                       referenceFasta: File, caseSentive: Boolean = false): Map[String, Set[String]] = {
+    rebuildContigMap(contigMap, getDictFromFasta(referenceFasta), caseSentive)
   }
 
   def rebuildContigMap(
       contigMap: File,
-      dict: SAMSequenceDictionary): Map[String, Set[String]] = {
+      dict: SAMSequenceDictionary,
+      caseSentive: Boolean): Map[String, Set[String]] = {
     val map = readContigMap(contigMap)
     (for (contig <- dict.getSequences) yield {
+
       val name = contig.getSequenceName
-      val set = map
+      val set = if (caseSentive) map
         .filter(x => x._1 == name || x._2.contains(name))
         .flatMap(x => x._2 + x._1)
         .filter(_ != name)
+        .toSet
+      else map
+        .filter(x => x._1.toLowerCase == name.toLowerCase || x._2.exists(name.toLowerCase == _.toLowerCase))
+        .flatMap(x => x._2 + x._1)
+        .filter(_.toLowerCase != name.toLowerCase)
         .toSet
       name -> set
     }).toMap
