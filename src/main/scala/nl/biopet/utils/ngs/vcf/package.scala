@@ -157,8 +157,23 @@ package object vcf {
       * @return
       */
     def getAttAsDouble(key: String, method: FieldMethod.Value = FieldMethod.All.asInstanceOf): List[Double] = {
-      val value = conversions.anyToDoubleList(record.getAttribute(key))
-      method.doubleList(value)
+      val value = if (record.hasAttribute(key))
+        conversions.anyToDoubleList(Option(record.getAttribute(key)))
+      else Nil
+      method.doubleMethod(value)
+    }
+
+    /**
+      * Look up a list of Strings in the info fields
+      * @param key Key to look up in the info fields
+      * @param method methods to apply on list, default returns all values
+      * @return
+      */
+    def getAttAsString(key: String, method: FieldMethod.Value = FieldMethod.All.asInstanceOf): List[String] = {
+      val value = if (record.hasAttribute(key))
+        conversions.anyToStringList(Option(record.getAttribute(key)))
+      else Nil
+      method.stringMethod(value)
     }
 
     /**
@@ -182,8 +197,23 @@ package object vcf {
       * @return
       */
     def getAttAsDouble(key: String, method: FieldMethod.Value = FieldMethod.All.asInstanceOf): List[Double] = {
-      val value = conversions.anyToDoubleList(genotype.getAnyAttribute(key))
-      method.doubleList(value)
+      val value = if (genotype.hasAnyAttribute(key))
+        conversions.anyToDoubleList(genotype.getAnyAttribute(key))
+      else Nil
+      method.doubleMethod(value)
+    }
+
+    /**
+      * Look up a list of Strings in the genotype fields
+      * @param key Key to look up in the genotype fields
+      * @param method methods to apply on list, default returns all values
+      * @return
+      */
+    def getAttAsString(key: String, method: FieldMethod.Value = FieldMethod.All.asInstanceOf): List[String] = {
+      val value = if (genotype.hasAnyAttribute(key))
+        conversions.anyToStringList(genotype.getAnyAttribute(key))
+      else Nil
+      method.stringMethod(value)
     }
 
     /**
