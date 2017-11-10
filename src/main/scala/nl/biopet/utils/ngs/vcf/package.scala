@@ -182,23 +182,6 @@ package object vcf {
   implicit class BiopetVariantContext(record: VariantContext) {
 
     /**
-      * Look up a list of doubles in the info fields
-      * @param key Key to look up in the info fields
-      * @param method methods to apply on list, default returns all values
-      * @return
-      */
-    def getAttAsDouble(
-        key: String,
-        method: FieldMethod.Value = FieldMethod.All.asInstanceOf)
-      : List[Double] = {
-      val value =
-        if (record.hasAttribute(key))
-          conversions.anyToDoubleList(Option(record.getAttribute(key)))
-        else Nil
-      method.doubleMethod(value)
-    }
-
-    /**
       * Look up a list of Strings in the info fields
       * @param key Key to look up in the info fields
       * @param method methods to apply on list, default returns all values
@@ -212,7 +195,7 @@ package object vcf {
         if (record.hasAttribute(key))
           conversions.anyToStringList(Option(record.getAttribute(key)))
         else Nil
-      method.stringMethod(value)
+      method.apply(value)
     }
 
     /**
@@ -231,23 +214,6 @@ package object vcf {
   implicit class BiopetGenotype(genotype: Genotype) {
 
     /**
-      * Look up a list of doubles in the genotype fields
-      * @param key Key to look up in the genotype fields
-      * @param method methods to apply on list, default returns all values
-      * @return
-      */
-    def getAttAsDouble(
-        key: String,
-        method: FieldMethod.Value = FieldMethod.All.asInstanceOf)
-      : List[Double] = {
-      val value =
-        if (genotype.hasAnyAttribute(key))
-          conversions.anyToDoubleList(genotype.getAnyAttribute(key))
-        else Nil
-      method.doubleMethod(value)
-    }
-
-    /**
       * Look up a list of Strings in the genotype fields
       * @param key Key to look up in the genotype fields
       * @param method methods to apply on list, default returns all values
@@ -261,7 +227,7 @@ package object vcf {
         if (genotype.hasAnyAttribute(key))
           conversions.anyToStringList(genotype.getAnyAttribute(key))
         else Nil
-      method.stringMethod(value)
+      method.apply(value)
     }
 
     /**

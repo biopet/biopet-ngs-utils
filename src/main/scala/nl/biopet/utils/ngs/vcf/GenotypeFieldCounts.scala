@@ -8,6 +8,7 @@ import nl.biopet.utils.Counts
 
 import scala.collection.JavaConversions._
 
+/** This class will track all values of 1 genotype field */
 class GenotypeFieldCounts(header: VCFHeader,
                           field: VCFFormatHeaderLine,
                           method: FieldMethod.Value)
@@ -21,10 +22,19 @@ class GenotypeFieldCounts(header: VCFHeader,
     samples.map(_._2 -> new Counts[String]())
 
   protected var _noValue: Array[Long] = Array.fill(samples.size)(0L)
-  def noValue: List[Long] = _noValue.toList
   protected var _total: Array[Long] = Array.fill(samples.size)(0L)
-  def total: List[Long] = _total.toList
 
+  /** Returns per sample the number of records without the field */
+  def noValue: Map[String, Long] = samples.map(x => x._1 -> _noValue(x._2))
+
+  /** Returns per sample the number of total records */
+  def total: Map[String, Long] = samples.map(x => x._1 -> _total(x._2))
+
+  /**
+    * Add records to counts
+    * @param record Vcf record
+    * @param sampleIdx Optional: Only do this given sample
+    */
   def addRecord(record: VariantContext, sampleIdx: Option[Int] = None): Unit = {
     sampleIdx.map(_ :: Nil).getOrElse(samples.values).foreach { idx =>
       val value = record.getGenotype(idx).getAttAsString(field.getID, method)
@@ -34,6 +44,7 @@ class GenotypeFieldCounts(header: VCFHeader,
     }
   }
 
+  /** Write histograms to a single file */
   def writeToFile(outputFile: File): Unit = {
     val writer = new PrintWriter(outputFile)
     writer.println(samples.keys.mkString("Sample\t", "\t", ""))
@@ -43,18 +54,22 @@ class GenotypeFieldCounts(header: VCFHeader,
     for (value <- values) {
       writer.println(
         samples
-          .map(s => map(s._2).getOrElse(value, 0L))
+          .map(s => map(s._1).getOrElse(value, 0L))
           .mkString(value + "\t", "\t", ""))
     }
     writer.close()
   }
 
-  def countsMap: Map[Int, Map[String, Long]] =
-    counts.map(x => x._1 -> x._2.countsMap)
+  /** Return a map of counts */
+  def countsMap: Map[String, Map[String, Long]] =
+    samples.map(x => x._1 -> counts(x._2).countsMap)
 
   def +=(other: GenotypeFieldCounts): GenotypeFieldCounts = {
-    for ((idx, c) <- other.counts) this.counts(idx) += c
+    for ((idx, c) <- other.counts) {
+      this.counts(idx) += c
+      this._noValue(idx) += other._noValue(idx)
+      this._total(idx) += other._total(idx)
+    }
     this
   }
-
 }

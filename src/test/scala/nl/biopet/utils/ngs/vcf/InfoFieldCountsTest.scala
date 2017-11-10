@@ -25,10 +25,12 @@ class InfoFieldCountsTest extends BiopetTest {
     val reader = new VCFFileReader(resourceFile("/multi.vcf"), false)
     val header = reader.getFileHeader
     val stats = new InfoFieldCounts(header.getInfoHeaderLine("DP"), FieldMethod.Max)
-    intercept[Exception] {
-      reader.foreach(stats.addRecord)
-    }.getMessage shouldBe "Not supported method"
+    reader.foreach(stats.addRecord)
     reader.close()
+
+    stats.total shouldBe 4L
+    stats.noValue shouldBe 0L
+    stats.countsMap shouldBe Map("1.0" -> 1, "3.0" -> 1, "2.0" -> 2)
   }
 
   @Test
@@ -36,10 +38,12 @@ class InfoFieldCountsTest extends BiopetTest {
     val reader = new VCFFileReader(resourceFile("/multi.vcf"), false)
     val header = reader.getFileHeader
     val stats = new InfoFieldCounts(header.getInfoHeaderLine("DP"), FieldMethod.Min)
-    intercept[Exception] {
-      reader.foreach(stats.addRecord)
-    }.getMessage shouldBe "Not supported method"
+    reader.foreach(stats.addRecord)
     reader.close()
+
+    stats.total shouldBe 4L
+    stats.noValue shouldBe 0L
+    stats.countsMap shouldBe Map("1.0" -> 2, "3.0" -> 1, "2.0" -> 1)
   }
 
   @Test
@@ -47,10 +51,12 @@ class InfoFieldCountsTest extends BiopetTest {
     val reader = new VCFFileReader(resourceFile("/multi.vcf"), false)
     val header = reader.getFileHeader
     val stats = new InfoFieldCounts(header.getInfoHeaderLine("DP"), FieldMethod.Avg)
-    intercept[Exception] {
-      reader.foreach(stats.addRecord)
-    }.getMessage shouldBe "Not supported method"
+    reader.foreach(stats.addRecord)
     reader.close()
+
+    stats.total shouldBe 4L
+    stats.noValue shouldBe 0L
+    stats.countsMap shouldBe Map("1.0" -> 1, "1.3333333333333333" -> 1, "3.0" -> 1, "2.0" -> 1)
   }
 
   @Test
