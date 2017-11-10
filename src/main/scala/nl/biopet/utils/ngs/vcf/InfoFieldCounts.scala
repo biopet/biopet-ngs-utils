@@ -48,8 +48,8 @@ class InfoFieldCounts(field: VCFInfoHeaderLine, method: FieldMethod.Value)
   /** Combining an other [[InfoFieldCounts]] into this */
   def +=(other: InfoFieldCounts): InfoFieldCounts = {
     this.counts += other.counts
-    this.noValue += other.noValue
-    this.total += other.total
+    this._noValue += other._noValue
+    this._total += other._total
     this
   }
 
