@@ -1,18 +1,12 @@
 package nl.biopet.utils.ngs.fasta
 
 import java.io.{File, PrintWriter}
-import java.nio.file.Paths
 
+import nl.biopet.test.BiopetTest
 import nl.biopet.utils.ngs.fasta
-import org.scalatest.Matchers
-import org.scalatest.testng.TestNGSuite
 import org.testng.annotations.Test
 
-class FastaUtilsTest extends TestNGSuite with Matchers {
-
-  private def resourcePath(p: String): String = {
-    Paths.get(getClass.getResource(p).toURI).toString
-  }
+class FastaUtilsTest extends BiopetTest {
 
   @Test
   def testRebuildContigMap(): Unit = {
@@ -28,6 +22,26 @@ class FastaUtilsTest extends TestNGSuite with Matchers {
     val map = fasta.rebuildContigMap(inputFile, referenceFile)
 
     map shouldBe Map("chrQ" -> Set("chrT"))
+  }
+
+  @Test
+  def testRebuildContigMapReal(): Unit = {
+    val inputFile: File = resourceFile("/H.sapiens-GRCh37.contig.map.tsv")
+    val referenceFile: File = resourceFile("/fake_GRCh37.p13_no_alt_analysis_set.fa")
+
+    val map = fasta.rebuildContigMap(inputFile, referenceFile)
+
+    map("chr11_GL000202_random") shouldBe Set("HSCHR11_RANDOM_CTG2","GL000202.1", "NT_113921.2")
+  }
+
+  @Test
+  def testRebuildContigMapCaseSensitive(): Unit = {
+    val inputFile: File = resourceFile("/H.sapiens-GRCh37.contig.map.tsv")
+    val referenceFile: File = resourceFile("/fake_GRCh37.p13_no_alt_analysis_set.fa")
+
+    val map = fasta.rebuildContigMap(inputFile, referenceFile, caseSentive = true)
+
+    map("chr11_GL000202_random") shouldBe Set()
   }
 
   @Test
