@@ -7,6 +7,8 @@ import htsjdk.variant.vcf.{VCFFileReader, VCFHeader}
 import nl.biopet.utils.conversions
 import nl.biopet.utils.ngs.intervals.BedRecord
 
+import java.util
+
 import scala.collection.JavaConversions._
 
 package object vcf {
