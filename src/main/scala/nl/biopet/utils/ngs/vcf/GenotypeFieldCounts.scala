@@ -37,7 +37,9 @@ class GenotypeFieldCounts(header: VCFHeader,
     */
   def addRecord(record: VariantContext, sampleIdx: Option[Int] = None): Unit = {
     sampleIdx.map(_ :: Nil).getOrElse(samples.values).foreach { idx =>
-      val value = record.getGenotype(idx).getAttAsString(field.getID, method)
+      val value = record
+        .getGenotype(idx)
+        .getAttAsString(field.getID, method)
       if (value.isEmpty) _noValue(idx) += 1
       else value.foreach(counts(idx).add)
       _total(idx) += 1

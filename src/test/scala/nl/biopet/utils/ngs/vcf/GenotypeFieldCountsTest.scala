@@ -18,9 +18,9 @@ class GenotypeFieldCountsTest extends BiopetTest {
     reader.foreach(stats.addRecord(_))
     reader.close()
 
-    stats.total shouldBe List(4, 4, 4)
-    stats.noValue shouldBe List(4, 4, 4)
-    stats.countsMap shouldBe Map(2 -> Map(), 1 -> Map(), 0 -> Map())
+    stats.total shouldBe Map("Sample_3" -> 4, "Sample_2" -> 4, "Sample_1" -> 4)
+    stats.noValue shouldBe Map("Sample_3" -> 4, "Sample_2" -> 4, "Sample_1" -> 4)
+    stats.countsMap shouldBe Map("Sample_3" -> Map(), "Sample_2" -> Map(), "Sample_1" -> Map())
   }
 
   @DataProvider(name = "inCorrectMethod")
@@ -36,12 +36,12 @@ class GenotypeFieldCountsTest extends BiopetTest {
     reader.foreach(stats.addRecord(_))
     reader.close()
 
-    stats.total shouldBe List(4, 4, 4)
-    stats.noValue shouldBe List(1, 1, 1)
+    stats.total shouldBe Map("Sample_3" -> 4, "Sample_2" -> 4, "Sample_1" -> 4)
+    stats.noValue shouldBe Map("Sample_3" -> 1, "Sample_2" -> 1, "Sample_1" -> 1)
     stats.countsMap shouldBe Map(
-      2 -> Map("5.0" -> 3),
-      1 -> Map("5.0" -> 2, "1.0" -> 1),
-      0 -> Map("5.0" -> 2, "1.0" -> 1)
+      "Sample_3" -> Map("5.0" -> 3),
+      "Sample_2" -> Map("5.0" -> 2, "1.0" -> 1),
+      "Sample_1" -> Map("5.0" -> 2, "1.0" -> 1)
     )
     val output = File.createTempFile("test,", ".tsv")
     output.deleteOnExit()
@@ -65,12 +65,12 @@ class GenotypeFieldCountsTest extends BiopetTest {
     reader.foreach(stats.addRecord(_))
     reader.close()
 
-    stats.total shouldBe List(4, 4, 4)
-    stats.noValue shouldBe List(1, 1, 1)
+    stats.total shouldBe Map("Sample_3" -> 4, "Sample_2" -> 4, "Sample_1" -> 4)
+    stats.noValue shouldBe Map("Sample_3" -> 1, "Sample_2" -> 1, "Sample_1" -> 1)
     stats.countsMap shouldBe Map(
-      2 -> Map("5" -> 3),
-      1 -> Map("5" -> 2, "1" -> 1),
-      0 -> Map("5" -> 2, "1" -> 1)
+      "Sample_3" -> Map("5" -> 3),
+      "Sample_2" -> Map("5" -> 2, "1" -> 1),
+      "Sample_1" -> Map("5" -> 2, "1" -> 1)
     )
     val output = File.createTempFile("test,", ".tsv")
     output.deleteOnExit()
