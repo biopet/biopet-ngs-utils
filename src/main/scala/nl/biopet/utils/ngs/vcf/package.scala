@@ -1,28 +1,17 @@
 package nl.biopet.utils.ngs
 
 import java.io.File
-import java.util
 
 import htsjdk.variant.variantcontext.{Allele, Genotype, VariantContext}
 import htsjdk.variant.vcf.{VCFFileReader, VCFHeader}
+import nl.biopet.utils.conversions
 import nl.biopet.utils.ngs.intervals.BedRecord
+
+import java.util
 
 import scala.collection.JavaConversions._
 
 package object vcf {
-
-  /**
-    * Return longest allele of VariantContext.
-    *
-    * @param vcfRecord record to check
-    * @return allele with most nucleotides
-    */
-  def getLongestAllele(vcfRecord: VariantContext): Allele = {
-    val alleles = vcfRecord.getAlleles
-    val longestAlleleId =
-      alleles.map(_.getBases.length).zipWithIndex.maxBy(_._1)._2
-    alleles(longestAlleleId)
-  }
 
   /**
     * Method will extend a allele till a new length
@@ -91,32 +80,6 @@ package object vcf {
     val samples = reader.getFileHeader.getSampleNamesInOrder.toList
     reader.close()
     samples
-  }
-
-  /**
-    * Check whether record has minimum genome Quality
-    * @param record variant context
-    * @param sample sample name
-    * @param minGQ minimum genome quality value
-    * @return
-    */
-  def hasMinGenomeQuality(record: VariantContext,
-                          sample: String,
-                          minGQ: Int): Boolean = {
-    if (!record.getSampleNamesOrderedByName.contains(sample))
-      throw new IllegalArgumentException("Sample does not exist")
-    val gt = record.getGenotype(sample)
-    hasMinGenomeQuality(gt, minGQ)
-  }
-
-  /**
-    * Check whether genotype has minimum genome Quality
-    * @param gt Genotype
-    * @param minGQ minimum genome quality value
-    * @return
-    */
-  def hasMinGenomeQuality(gt: Genotype, minGQ: Int): Boolean = {
-    gt.hasGQ && gt.getGQ >= minGQ
   }
 
   def getVcfIndexFile(vcfFile: File): File = {
@@ -215,4 +178,66 @@ package object vcf {
       def close(): Unit = reader.close()
     }
   }
+
+  implicit class BiopetVariantContext(record: VariantContext) {
+
+    /**
+      * Look up a list of Strings in the info fields
+      * @param key Key to look up in the info fields
+      * @param method methods to apply on list, default returns all values
+      * @return
+      */
+    def getAttAsString(
+        key: String,
+        method: FieldMethod.Value = FieldMethod.All.asInstanceOf)
+      : List[String] = {
+      val value =
+        if (record.hasAttribute(key))
+          conversions.anyToStringList(Option(record.getAttribute(key)))
+        else Nil
+      method.apply(value)
+    }
+
+    /**
+      * Return longest allele of VariantContext.
+      *
+      * @return allele with most nucleotides
+      */
+    def getLongestAllele: Allele = {
+      val alleles = record.getAlleles
+      val longestAlleleId =
+        alleles.map(_.getBases.length).zipWithIndex.maxBy(_._1)._2
+      alleles(longestAlleleId)
+    }
+  }
+
+  implicit class BiopetGenotype(genotype: Genotype) {
+
+    /**
+      * Look up a list of Strings in the genotype fields
+      * @param key Key to look up in the genotype fields
+      * @param method methods to apply on list, default returns all values
+      * @return
+      */
+    def getAttAsString(
+        key: String,
+        method: FieldMethod.Value = FieldMethod.All.asInstanceOf)
+      : List[String] = {
+      val value =
+        if (genotype.hasAnyAttribute(key))
+          conversions.anyToStringList(genotype.getAnyAttribute(key))
+        else Nil
+      method.apply(value)
+    }
+
+    /**
+      * Check whether genotype has minimum genome Quality
+      * @param minGQ minimum genome quality value
+      * @return
+      */
+    def hasMinGenomeQuality(minGQ: Int): Boolean = {
+      genotype.hasGQ && genotype.getGQ >= minGQ
+    }
+  }
+
 }
