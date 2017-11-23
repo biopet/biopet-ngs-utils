@@ -143,7 +143,10 @@ case class BedRecordList(chrRecords: Map[String, List[BedRecord]],
   }
 
   def validateContigs(reference: File): BedRecordList = {
-    val dict = fasta.getCachedDict(reference)
+    this.validateContigs(fasta.getCachedDict(reference))
+  }
+
+  def validateContigs(dict: SAMSequenceDictionary): BedRecordList = {
     val notExisting =
       chrRecords.keys.filter(dict.getSequence(_) == null).toList
     require(
