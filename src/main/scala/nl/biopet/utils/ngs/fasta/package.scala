@@ -86,29 +86,35 @@ package object fasta {
     readContigMap(file).flatMap(x => x._2.map(y => y -> x._1))
   }
 
-  def rebuildContigMap(contigMap: File,
-                       referenceFasta: File, caseSentive: Boolean = false): Map[String, Set[String]] = {
+  def rebuildContigMap(
+      contigMap: File,
+      referenceFasta: File,
+      caseSentive: Boolean = false): Map[String, Set[String]] = {
     rebuildContigMap(contigMap, getDictFromFasta(referenceFasta), caseSentive)
   }
 
-  def rebuildContigMap(
-      contigMap: File,
-      dict: SAMSequenceDictionary,
-      caseSentive: Boolean): Map[String, Set[String]] = {
+  def rebuildContigMap(contigMap: File,
+                       dict: SAMSequenceDictionary,
+                       caseSentive: Boolean): Map[String, Set[String]] = {
     val map = readContigMap(contigMap)
     (for (contig <- dict.getSequences) yield {
 
       val name = contig.getSequenceName
-      val set = if (caseSentive) map
-        .filter(x => x._1 == name || x._2.contains(name))
-        .flatMap(x => x._2 + x._1)
-        .filter(_ != name)
-        .toSet
-      else map
-        .filter(x => x._1.toLowerCase == name.toLowerCase || x._2.exists(name.toLowerCase == _.toLowerCase))
-        .flatMap(x => x._2 + x._1)
-        .filter(_.toLowerCase != name.toLowerCase)
-        .toSet
+      val set =
+        if (caseSentive)
+          map
+            .filter(x => x._1 == name || x._2.contains(name))
+            .flatMap(x => x._2 + x._1)
+            .filter(_ != name)
+            .toSet
+        else
+          map
+            .filter(x =>
+              x._1.toLowerCase == name.toLowerCase || x._2.exists(
+                name.toLowerCase == _.toLowerCase))
+            .flatMap(x => x._2 + x._1)
+            .filter(_.toLowerCase != name.toLowerCase)
+            .toSet
       name -> set
     }).toMap
   }

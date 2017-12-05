@@ -17,7 +17,9 @@ case class VcfField(key: String, method: FieldMethod.Value) {
 object VcfField {
   def fromArg(arg: String): VcfField = {
     val values = arg.split(":")
-    require(values.size == 2, s"A field should be formatted like: <tag>:<method>. Possible methods: ${FieldMethod.values}")
+    require(
+      values.size == 2,
+      s"A field should be formatted like: <tag>:<method>. Possible methods: ${FieldMethod.values}")
     val key: String = values.head
     val method: FieldMethod.Value = FieldMethod.withName(values(1))
     VcfField(key, method)
