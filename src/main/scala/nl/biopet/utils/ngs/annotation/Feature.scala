@@ -61,7 +61,7 @@ object Feature {
     val values = line.split("\t")
 
     require(values.size == 9 || values.size == 8,
-            s"A Gtf line should have 9 columns, gtf line: $line")
+      s"A Gtf line should have 8 or 9 columns, gtf line: '$line'")
 
     val strand = values(6) match {
       case "+" => Some(true)
@@ -81,9 +81,13 @@ object Feature {
       .map(parseAttribute)
       .toMap
 
-    val score = values(5) match {
-      case "." => None
-      case s: String => Some(s.toDouble)
+    val score = try { values(5) match {
+        case "." => None
+        case s: String => Some(s.toDouble)
+      }
+    } catch {
+      case e: NumberFormatException =>
+        throw new IllegalStateException("Score in a gtf line must be number", e)
     }
 
     val frame = values(7) match {
