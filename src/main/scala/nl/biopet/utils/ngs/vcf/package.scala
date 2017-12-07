@@ -25,41 +25,10 @@ package object vcf {
   }
 
   /**
-    * Stands for scalaListToJavaObjectArrayList
-    * Convert a scala List[Any] to a java ArrayList[Object]. This is necessary for BCF conversions
-    * As scala ints and floats cannot be directly cast to java objects (they aren't objects),
-    * we need to box them.
-    * For items not Int, Float or Object, we assume them to be strings (TODO: sane assumption?)
-    * @param array scala List[Any]
-    * @return converted java ArrayList[Object]
+    * @deprecated Moved to nl.biopet.utils.conversions
     */
   def scalaListToJavaObjectArrayList(
-      array: List[Any]): util.ArrayList[Object] = {
-    val out = new util.ArrayList[Object]()
-
-    array.foreach {
-      case x: Long => out.add(Long.box(x))
-      case x: Int => out.add(Int.box(x))
-      case x: Char => out.add(Char.box(x))
-      case x: Byte => out.add(Byte.box(x))
-      case x: Double => out.add(Double.box(x))
-      case x: Float => out.add(Float.box(x))
-      case x: Boolean => out.add(Boolean.box(x))
-      case x: String => out.add(x)
-      case x: Object => out.add(x)
-      case x => out.add(x.toString)
-    }
-    out
-  }
-
-  //TODO: Add genotype comparing to this function
-  def identicalVariantContext(var1: VariantContext,
-                              var2: VariantContext): Boolean = {
-    var1.getContig == var2.getContig &&
-    var1.getStart == var2.getStart &&
-    var1.getEnd == var2.getEnd &&
-    var1.getAttributes == var2.getAttributes
-  }
+      array: List[Any]): util.ArrayList[Object] = conversions.scalaListToJavaObjectArrayList(array)
 
   /**
     * Return true if header is a block-type GVCF file
@@ -83,7 +52,7 @@ package object vcf {
   }
 
   def getVcfIndexFile(vcfFile: File): File = {
-    val name = vcfFile.getAbsolutePath
+    val name = vcfFile.getPath
     if (name.endsWith(".vcf")) new File(name + ".idx")
     else if (name.endsWith(".vcf.gz")) new File(name + ".tbi")
     else
@@ -96,16 +65,6 @@ package object vcf {
     val hasNext = reader.iterator().hasNext
     reader.close()
     !hasNext
-  }
-
-  /**
-    * Check whether genotype is of the form 0/.
-    * @param genotype genotype
-    * @return boolean
-    */
-  def isCompoundNoCall(genotype: Genotype): Boolean = {
-    genotype.isCalled && genotype.getAlleles.exists(_.isNoCall) && genotype.getAlleles
-      .exists(_.isReference)
   }
 
   /** Give back the number of alleles that overlap */
@@ -144,9 +103,9 @@ package object vcf {
     */
   def loadRegion(inputFile: File, region: BedRecord): Seq[VariantContext] = {
     val reader = new VCFFileReader(inputFile, true)
-    val records = loadRegion(reader, region)
+    val records = loadRegion(reader, region).toIndexedSeq
     reader.close()
-    records.toSeq
+    records
   }
 
   /**
@@ -164,11 +123,11 @@ package object vcf {
   /**
     * This method will return multiple region as a single iterator
     * @param inputFile input vcf file
-    * @param regions regions to fetch
+    * @param regions regions to fetch, if regions does overlap
     * @return
     */
   def loadRegions(inputFile: File,
-                  regions: Iterator[BedRecord]): Iterator[VariantContext] = {
+                  regions: Iterator[BedRecord]): Iterator[VariantContext] with AutoCloseable = {
     new Iterator[VariantContext] with AutoCloseable {
       private val reader = new VCFFileReader(inputFile, true)
       private val it = regions.flatMap(loadRegion(reader, _))
@@ -198,16 +157,23 @@ package object vcf {
       method.apply(value)
     }
 
+    /** Compare to an other VariantContext */
+    def identicalVariantContext(other: VariantContext): Boolean = {
+      record.getContig == other.getContig &&
+      record.getStart == other.getStart &&
+      record.getEnd == other.getEnd &&
+      record.getAlleles == other.getAlleles &&
+      record.getAttributes == other.getAttributes &&
+        record.getGenotypesOrderedByName.zip(other.getGenotypesOrderedByName).forall(x => x._1.identicalGenotype(x._2))
+    }
+
     /**
       * Return longest allele of VariantContext.
       *
-      * @return allele with most nucleotides
+      * @return length of the allele with the most nucleotides
       */
-    def getLongestAllele: Allele = {
-      val alleles = record.getAlleles
-      val longestAlleleId =
-        alleles.map(_.getBases.length).zipWithIndex.maxBy(_._1)._2
-      alleles(longestAlleleId)
+    def getLongestAlleleSize: Int = {
+      record.getAlleles.map(_.getBases.length).max
     }
   }
 
@@ -228,6 +194,19 @@ package object vcf {
           conversions.anyToStringList(genotype.getAnyAttribute(key))
         else Nil
       method.apply(value)
+    }
+
+    /** Compares to an other Genotype */
+    def identicalGenotype(other: Genotype): Boolean = {
+      genotype.getExtendedAttributes == other.getExtendedAttributes &&
+      genotype.getAlleles == other.getAlleles &&
+      genotype.getSampleName == other.getSampleName
+    }
+
+    /** Check whether genotype is of the form 0/. */
+    def isCompoundNoCall: Boolean = {
+      genotype.isCalled && genotype.getAlleles.exists(_.isNoCall) && genotype.getAlleles
+        .exists(_.isReference)
     }
 
     /**

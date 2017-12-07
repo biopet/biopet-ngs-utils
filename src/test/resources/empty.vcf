@@ -1,0 +1,7 @@
+##fileformat=VCFv4.2
+##INFO=<ID=DP,Number=.,Type=String,Description="Depth">
+##INFO=<ID=EMPTY,Number=.,Type=String,Description="Depth">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Genotype">
+##FORMAT=<ID=EMPTY,Number=.,Type=Integer,Description="Genotype">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	Sample_1	Sample_2	Sample_3
