@@ -17,6 +17,7 @@ package nl.biopet.utils.ngs.vcf
 import java.io.File
 
 import htsjdk.variant.variantcontext.{Allele, GenotypeBuilder, VariantContextBuilder}
+import htsjdk.variant.vcf.{VCFHeader, VCFHeaderLine}
 import nl.biopet.test.BiopetTest
 import nl.biopet.utils.ngs.intervals.BedRecord
 import org.testng.annotations.Test
@@ -170,5 +171,32 @@ class VcfUtilsTest extends BiopetTest {
 
     val v2 = new VariantContextBuilder().chr("chrQ").start(2).computeEndFromAlleles(alleles2, 2).alleles(alleles2).make()
     v2.getLongestAlleleSize shouldBe 3
+  }
+
+  @Test
+  def testHasMinGenomeQuality(): Unit = {
+    val alleles1 = List(Allele.create("A", true), Allele.create("C"))
+    val g1 = GenotypeBuilder.create("test", alleles1)
+
+    g1.hasGQ shouldBe false
+    g1.hasMinGenomeQuality(3) shouldBe false
+    g1.hasMinGenomeQuality(0) shouldBe false
+
+    val g2 = new GenotypeBuilder().GQ(3).alleles(alleles1).name("test").make()
+
+    g2.hasGQ shouldBe true
+    g2.hasMinGenomeQuality(2) shouldBe true
+    g2.hasMinGenomeQuality(3) shouldBe true
+    g2.hasMinGenomeQuality(4) shouldBe false
+  }
+
+  @Test
+  def testIsBlockGVcf(): Unit = {
+    val h1 = new VCFHeader
+    isBlockGVcf(h1) shouldBe false
+
+    val h2 = new VCFHeader
+    h2.addMetaDataLine(new VCFHeaderLine("GVCFBlock", ""))
+    isBlockGVcf(h2) shouldBe true
   }
 }
