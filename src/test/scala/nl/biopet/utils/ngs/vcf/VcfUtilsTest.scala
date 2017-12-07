@@ -24,7 +24,8 @@ import org.testng.annotations.Test
 import scala.collection.JavaConversions._
 
 /**
-  * Created by Sander Bollen on 4-10-16.
+  * @author Peter van 't Hof
+  * @author Sander Bollen
   */
 class VcfUtilsTest extends BiopetTest {
   

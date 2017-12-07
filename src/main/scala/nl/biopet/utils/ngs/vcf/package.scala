@@ -28,7 +28,8 @@ package object vcf {
     * @deprecated Moved to nl.biopet.utils.conversions
     */
   def scalaListToJavaObjectArrayList(
-      array: List[Any]): util.ArrayList[Object] = conversions.scalaListToJavaObjectArrayList(array)
+      array: List[Any]): util.ArrayList[Object] =
+    conversions.scalaListToJavaObjectArrayList(array)
 
   /**
     * Return true if header is a block-type GVCF file
@@ -126,8 +127,8 @@ package object vcf {
     * @param regions regions to fetch, if regions does overlap
     * @return
     */
-  def loadRegions(inputFile: File,
-                  regions: Iterator[BedRecord]): Iterator[VariantContext] with AutoCloseable = {
+  def loadRegions(inputFile: File, regions: Iterator[BedRecord])
+    : Iterator[VariantContext] with AutoCloseable = {
     new Iterator[VariantContext] with AutoCloseable {
       private val reader = new VCFFileReader(inputFile, true)
       private val it = regions.flatMap(loadRegion(reader, _))
@@ -164,7 +165,9 @@ package object vcf {
       record.getEnd == other.getEnd &&
       record.getAlleles == other.getAlleles &&
       record.getAttributes == other.getAttributes &&
-        record.getGenotypesOrderedByName.zip(other.getGenotypesOrderedByName).forall(x => x._1.identicalGenotype(x._2))
+      record.getGenotypesOrderedByName
+        .zip(other.getGenotypesOrderedByName)
+        .forall(x => x._1.identicalGenotype(x._2))
     }
 
     /**
