@@ -32,7 +32,8 @@ class GenotypeFieldCountsTest extends BiopetTest {
   def testIncorrect(method: FieldMethod.Value): Unit = {
     val reader = new VCFFileReader(resourceFile("/multi.vcf"), false)
     val header = reader.getFileHeader
-    val stats = new GenotypeFieldCounts(header, header.getFormatHeaderLine("DP"), method)
+    val vcfField = VcfField("DP", method)
+    val stats = vcfField.newGenotypeCount(header)
     reader.foreach(stats.addRecord(_))
     reader.close()
 

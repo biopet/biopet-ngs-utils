@@ -11,7 +11,8 @@ class InfoFieldCountsTest extends BiopetTest {
   def testNonExist(): Unit = {
     val reader = new VCFFileReader(resourceFile("/multi.vcf"), false)
     val header = reader.getFileHeader
-    val stats = new InfoFieldCounts(header.getInfoHeaderLine("EMPTY"), FieldMethod.All)
+    val vcfField = VcfField("EMPTY", FieldMethod.All)
+    val stats = vcfField.newInfoCount(header)
     reader.foreach(stats.addRecord)
     reader.close()
 
