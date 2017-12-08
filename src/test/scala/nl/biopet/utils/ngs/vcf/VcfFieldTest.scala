@@ -7,6 +7,7 @@ class VcfFieldTest extends  BiopetTest {
   @Test
   def testCorrect(): Unit = {
     val vcfField = VcfField.fromArg("DP:All")
+    vcfField.toString shouldBe "DP_All"
     vcfField.key shouldBe "DP"
     vcfField.method shouldBe FieldMethod.All
   }
