@@ -1,10 +1,13 @@
 package nl.biopet.utils.ngs.vcf
 
+import java.io.File
+
 import htsjdk.variant.vcf.VCFFileReader
 import nl.biopet.test.BiopetTest
 import org.testng.annotations.Test
 
 import scala.collection.JavaConversions._
+import scala.io.Source
 
 class InfoFieldCountsTest extends BiopetTest {
   @Test
@@ -96,6 +99,17 @@ class InfoFieldCountsTest extends BiopetTest {
     stats.total shouldBe 8L
     stats.noValue shouldBe 0L
     stats.countsMap shouldBe Map("2" -> 4L, "1" -> 6L, "3" -> 2L)
+
+    val outputFilr = File.createTempFile("test.", ".tsv")
+    stats.writeHistogram(outputFilr)
+    val lines = Source.fromFile(outputFilr).getLines().toList
+    lines.head shouldBe "value\tcount"
+    lines(1) shouldBe "1\t6"
+    lines(2) shouldBe "2\t4"
+    lines(3) shouldBe "3\t2"
+
+    val histogram = stats.asHistrogram
+    histogram.countsMap shouldBe Map(2.0 -> 4L, 1.0 -> 6L, 3.0 -> 2L)
   }
 
   @Test
@@ -115,5 +129,4 @@ class InfoFieldCountsTest extends BiopetTest {
     stats.noValue shouldBe 0L
     stats.countsMap shouldBe Map("1" -> 4L, "2" -> 4L, "3" -> 2L)
   }
-
 }
