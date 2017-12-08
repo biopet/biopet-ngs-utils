@@ -247,6 +247,23 @@ class BamUtilsTest extends BiopetTest {
   }
 
   @Test
+  def testReadgroup(): Unit = {
+    val readgroups = sampleReadGroups(List(BamUtilsTest.pairedEndBam01))
+
+    readgroups.head._1 shouldBe "sample01"
+    readgroups.map(_._2.size).sum shouldBe 2
+  }
+
+  @Test
+  def testReadgroupReaders(): Unit = {
+    val reader = SamReaderFactory.makeDefault.open(BamUtilsTest.pairedEndBam01)
+    val readgroups = sampleReadGroups(Map("sample01" -> (reader, BamUtilsTest.pairedEndBam01)))
+
+    readgroups.head._1 shouldBe "sample01"
+    readgroups.map(_._2.size).sum shouldBe 2
+  }
+
+  @Test
   def testDictCheck(): Unit = {
     val dict1 = nl.biopet.utils.ngs.fasta.getCachedDict(resourceFile("/fake_chrQ.fa"))
     dict1.getSequences.size() shouldBe 1
