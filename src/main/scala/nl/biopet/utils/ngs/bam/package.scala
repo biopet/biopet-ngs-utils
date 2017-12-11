@@ -188,7 +188,7 @@ package object bam {
     }.toMap
 
   /** This class will add functionality to [[SAMSequenceDictionary]] */
-  implicit class SamDictCheck(samDicts: SAMSequenceDictionary) {
+  implicit class BiopetSamDict(samDicts: SAMSequenceDictionary) {
 
     /**
       * This method will check if all contig and sizes are the same without looking at the order of the contigs

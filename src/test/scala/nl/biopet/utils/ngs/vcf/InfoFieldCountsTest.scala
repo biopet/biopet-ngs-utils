@@ -1,22 +1,31 @@
 package nl.biopet.utils.ngs.vcf
 
+import java.io.File
+
 import htsjdk.variant.vcf.VCFFileReader
 import nl.biopet.test.BiopetTest
 import org.testng.annotations.Test
 
 import scala.collection.JavaConversions._
+import scala.io.Source
 
 class InfoFieldCountsTest extends BiopetTest {
   @Test
   def testNonExist(): Unit = {
     val reader = new VCFFileReader(resourceFile("/multi.vcf"), false)
     val header = reader.getFileHeader
-    val stats = new InfoFieldCounts(header.getInfoHeaderLine("EMPTY"), FieldMethod.All)
+    val vcfField = VcfField("EMPTY", FieldMethod.All)
+    val stats = vcfField.newInfoCount(header)
     reader.foreach(stats.addRecord)
     reader.close()
 
     stats.total shouldBe 4L
     stats.noValue shouldBe 4L
+    stats.countsMap shouldBe Map()
+
+    stats += stats
+    stats.total shouldBe 8L
+    stats.noValue shouldBe 8L
     stats.countsMap shouldBe Map()
   }
 
@@ -31,6 +40,11 @@ class InfoFieldCountsTest extends BiopetTest {
     stats.total shouldBe 4L
     stats.noValue shouldBe 0L
     stats.countsMap shouldBe Map("1.0" -> 1, "3.0" -> 1, "2.0" -> 2)
+
+    stats += stats
+    stats.total shouldBe 8L
+    stats.noValue shouldBe 0L
+    stats.countsMap shouldBe Map("1.0" -> 2, "3.0" -> 2, "2.0" -> 4)
   }
 
   @Test
@@ -44,6 +58,11 @@ class InfoFieldCountsTest extends BiopetTest {
     stats.total shouldBe 4L
     stats.noValue shouldBe 0L
     stats.countsMap shouldBe Map("1.0" -> 2, "3.0" -> 1, "2.0" -> 1)
+
+    stats += stats
+    stats.total shouldBe 8L
+    stats.noValue shouldBe 0L
+    stats.countsMap shouldBe Map("1.0" -> 4, "3.0" -> 2, "2.0" -> 2)
   }
 
   @Test
@@ -57,6 +76,11 @@ class InfoFieldCountsTest extends BiopetTest {
     stats.total shouldBe 4L
     stats.noValue shouldBe 0L
     stats.countsMap shouldBe Map("1.0" -> 1, "1.3333333333333333" -> 1, "3.0" -> 1, "2.0" -> 1)
+
+    stats += stats
+    stats.total shouldBe 8L
+    stats.noValue shouldBe 0L
+    stats.countsMap shouldBe Map("1.0" -> 2, "1.3333333333333333" -> 2, "3.0" -> 2, "2.0" -> 2)
   }
 
   @Test
@@ -70,6 +94,22 @@ class InfoFieldCountsTest extends BiopetTest {
     stats.total shouldBe 4L
     stats.noValue shouldBe 0L
     stats.countsMap shouldBe Map("2" -> 2L, "1" -> 3L, "3" -> 1L)
+
+    stats += stats
+    stats.total shouldBe 8L
+    stats.noValue shouldBe 0L
+    stats.countsMap shouldBe Map("2" -> 4L, "1" -> 6L, "3" -> 2L)
+
+    val outputFilr = File.createTempFile("test.", ".tsv")
+    stats.writeHistogram(outputFilr)
+    val lines = Source.fromFile(outputFilr).getLines().toList
+    lines.head shouldBe "value\tcount"
+    lines(1) shouldBe "1\t6"
+    lines(2) shouldBe "2\t4"
+    lines(3) shouldBe "3\t2"
+
+    val histogram = stats.asHistrogram
+    histogram.countsMap shouldBe Map(2.0 -> 4L, 1.0 -> 6L, 3.0 -> 2L)
   }
 
   @Test
@@ -83,6 +123,10 @@ class InfoFieldCountsTest extends BiopetTest {
     stats.total shouldBe 4L
     stats.noValue shouldBe 0L
     stats.countsMap shouldBe Map("1" -> 2L, "2" -> 2L, "3" -> 1L)
-  }
 
+    stats += stats
+    stats.total shouldBe 8L
+    stats.noValue shouldBe 0L
+    stats.countsMap shouldBe Map("1" -> 4L, "2" -> 4L, "3" -> 2L)
+  }
 }

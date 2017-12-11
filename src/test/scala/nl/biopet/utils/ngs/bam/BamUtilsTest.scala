@@ -17,16 +17,14 @@ package nl.biopet.utils.ngs.bam
 import java.io.File
 
 import htsjdk.samtools._
-import org.scalatest.Matchers
-import org.scalatest.mock.MockitoSugar
-import org.scalatest.testng.TestNGSuite
+import nl.biopet.test.BiopetTest
 import org.testng.annotations.{BeforeClass, Test}
 
 /**
   * Created by wyleung on 22-2-16.
   * Create samfile and records are borrowed from WipeReadsTest by @bow
   */
-class BamUtilsTest extends TestNGSuite with MockitoSugar with Matchers {
+class BamUtilsTest extends BiopetTest {
 
   private val samHeaderTemplate: SAMLineParser = {
     val samh = new SAMFileHeader
@@ -155,33 +153,40 @@ class BamUtilsTest extends TestNGSuite with MockitoSugar with Matchers {
     }
   }
 
-  @Test def testInputSingleEndOK(): Unit = {
+  @Test
+  def testInputSingleEndOK(): Unit = {
     sBamRecs1.size shouldBe 7
   }
 
-  @Test def testInputPairedEndOK(): Unit = {
+  @Test
+  def testInputPairedEndOK(): Unit = {
     pBamRecs1.size shouldBe 14
   }
 
-  @Test def testPairedRecords(): Unit = {
+  @Test
+  def testPairedRecords(): Unit = {
     sampleBamInsertSize(BamUtilsTest.pairedEndBam01) shouldBe 50
   }
 
-  @Test def testContigInsertsize(): Unit = {
+  @Test
+  def testContigInsertsize(): Unit = {
     contigInsertSize(BamUtilsTest.pairedEndBam01, "chrQ", 1, 10000) shouldBe Some(50)
     contigInsertSize(BamUtilsTest.pairedEndBam01, "chrR", 1, 10000) shouldBe None
   }
 
-  @Test def testContigInsertsizeContigNotFound: Nothing = {
+  @Test
+  def testContigInsertsizeContigNotFound: Nothing = {
     intercept(contigInsertSize(BamUtilsTest.pairedEndBam01, "chrW", 1, 10000))
 
   }
 
-  @Test def testSingleRecords(): Unit = {
+  @Test
+  def testSingleRecords(): Unit = {
     sampleBamInsertSize(BamUtilsTest.singleEndBam01) shouldBe 0
   }
 
-  @Test def testMultiBamInsertsizes(): Unit = {
+  @Test
+  def testMultiBamInsertsizes(): Unit = {
     val result = sampleBamsInsertSize(
       List(BamUtilsTest.singleEndBam01, BamUtilsTest.pairedEndBam01))
     result shouldEqual Map(
@@ -190,13 +195,15 @@ class BamUtilsTest extends TestNGSuite with MockitoSugar with Matchers {
     )
   }
 
-  @Test def testSampleBamNames(): Unit = {
+  @Test
+  def testSampleBamNames(): Unit = {
     sampleBamMap(List(BamUtilsTest.singleEndBam01)) shouldEqual Map(
       "sample01" -> BamUtilsTest.singleEndBam01
     )
   }
 
-  @Test def testSampleBamNamesMultipleSamplesSE(): Unit = {
+  @Test
+  def testSampleBamNamesMultipleSamplesSE(): Unit = {
     val thrown = intercept[IllegalArgumentException] {
       sampleBamMap(List(BamUtilsTest.singleEndBam01WithDoubleSamples))
     }
@@ -204,7 +211,8 @@ class BamUtilsTest extends TestNGSuite with MockitoSugar with Matchers {
       "Bam contains multiple sample IDs: " + BamUtilsTest.singleEndBam01WithDoubleSamples)
   }
 
-  @Test def testSampleBamNamesMultipleSamplesPE(): Unit = {
+  @Test
+  def testSampleBamNamesMultipleSamplesPE(): Unit = {
     val thrown = intercept[IllegalArgumentException] {
       sampleBamMap(List(BamUtilsTest.pairedEndBam01WithDoubleSamples))
     }
@@ -212,7 +220,8 @@ class BamUtilsTest extends TestNGSuite with MockitoSugar with Matchers {
       "Bam contains multiple sample IDs: " + BamUtilsTest.pairedEndBam01WithDoubleSamples)
   }
 
-  @Test def testSampleBamNamesNoRGSE(): Unit = {
+  @Test
+  def testSampleBamNamesNoRGSE(): Unit = {
     val thrown = intercept[IllegalArgumentException] {
       sampleBamMap(List(BamUtilsTest.singleEndBam01NoRG))
     }
@@ -220,7 +229,8 @@ class BamUtilsTest extends TestNGSuite with MockitoSugar with Matchers {
       "Bam does not contain sample ID or have no readgroups defined: " + BamUtilsTest.singleEndBam01NoRG)
   }
 
-  @Test def testSampleBamNamesNoRGPE(): Unit = {
+  @Test
+  def testSampleBamNamesNoRGPE(): Unit = {
     val thrown = intercept[IllegalArgumentException] {
       sampleBamMap(List(BamUtilsTest.pairedEndBam01NoRG))
     }
@@ -228,11 +238,57 @@ class BamUtilsTest extends TestNGSuite with MockitoSugar with Matchers {
       "Bam does not contain sample ID or have no readgroups defined: " + BamUtilsTest.pairedEndBam01NoRG)
   }
 
-  @Test def testSampleFoundTwice(): Unit = {
+  @Test
+  def testSampleFoundTwice(): Unit = {
     val thrown = intercept[IllegalArgumentException] {
       sampleBamMap(List(BamUtilsTest.pairedEndBam01, BamUtilsTest.pairedEndBam02))
     }
     thrown.getMessage should ===("Samples has been found twice")
+  }
+
+  @Test
+  def testReadgroup(): Unit = {
+    val readgroups = sampleReadGroups(List(BamUtilsTest.pairedEndBam01))
+
+    readgroups.head._1 shouldBe "sample01"
+    readgroups.map(_._2.size).sum shouldBe 2
+  }
+
+  @Test
+  def testReadgroupReaders(): Unit = {
+    val reader = SamReaderFactory.makeDefault.open(BamUtilsTest.pairedEndBam01)
+    val readgroups = sampleReadGroups(Map("sample01" -> (reader, BamUtilsTest.pairedEndBam01)))
+
+    readgroups.head._1 shouldBe "sample01"
+    readgroups.map(_._2.size).sum shouldBe 2
+  }
+
+  @Test
+  def testDictCheck(): Unit = {
+    val dict1 = nl.biopet.utils.ngs.fasta.getCachedDict(resourceFile("/fake_chrQ.fa"))
+    dict1.getSequences.size() shouldBe 1
+    dict1.getSequence("chrQ").getSequenceLength shouldBe 16571
+
+    val dict2 = nl.biopet.utils.ngs.fasta.getCachedDict(resourceFile("/fake_chrQ.fa"))
+    dict1.hashCode() shouldBe dict2.hashCode()
+    dict1.assertSameDictionary(dict2, true)
+    dict1.assertSameDictionary(dict2, false)
+
+    val dict3 = new SAMSequenceDictionary
+    val dict4 = new SAMSequenceDictionary
+
+    val seq1 = new SAMSequenceRecord("chr1", 4)
+    val seq2 = new SAMSequenceRecord("chr5", 10)
+
+    dict3.addSequence(seq1)
+    dict3.addSequence(seq2)
+    dict4.addSequence(seq2)
+    dict4.addSequence(seq1)
+
+    dict3.assertSameDictionary(dict4, true)
+    intercept[AssertionError] {
+      dict3.assertSameDictionary(dict4, false)
+    }
   }
 }
 
