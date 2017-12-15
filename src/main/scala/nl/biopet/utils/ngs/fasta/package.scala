@@ -90,7 +90,7 @@ package object fasta {
       contigMap: File,
       referenceFasta: File,
       caseSentive: Boolean = false): Map[String, Set[String]] = {
-    rebuildContigMap(contigMap, getDictFromFasta(referenceFasta), caseSentive)
+    rebuildContigMap(contigMap, getCachedDict(referenceFasta), caseSentive)
   }
 
   def rebuildContigMap(contigMap: File,
