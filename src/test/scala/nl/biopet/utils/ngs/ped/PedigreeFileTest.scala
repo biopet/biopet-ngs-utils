@@ -16,10 +16,12 @@ class PedigreeFileTest extends BiopetTest {
 
   @Test
   def testFile(): Unit = {
-    val pedFile = PedigreeFile(samples)
+    val pedFile = new PedigreeFile(samples)
     val file = File.createTempFile("test.", ".ped")
     file.deleteOnExit()
     pedFile.writeToFile(file)
+
+    pedFile("s4") shouldBe PedigreeSample("f2", "s4", "", "", Gender.Male, Phenotype.Missing)
 
     val pedFile2 = PedigreeFile.fromFile(file)
     pedFile shouldBe pedFile2
@@ -27,15 +29,18 @@ class PedigreeFileTest extends BiopetTest {
 
   @Test
   def testFiles(): Unit = {
-    val pedFile = PedigreeFile(samples)
-    val pedFile2 = pedFile + pedFile
-    pedFile.samples.size shouldBe 4
-    pedFile2.samples.size shouldBe 8
+    val pedFile1 = new PedigreeFile(samples)
+    val pedFile2 = new PedigreeFile(PedigreeSample("f2", "s5", "", "", Gender.Male, Phenotype.Missing) :: Nil)
+
+    val combinedPedFile = pedFile1 + pedFile2
+    pedFile1.samples.size shouldBe 4
+    pedFile2.samples.size shouldBe 1
+    combinedPedFile.samples.size shouldBe 5
   }
 
   @Test
   def testGroupByFamily(): Unit = {
-    val pedFile = PedigreeFile(samples)
+    val pedFile = new PedigreeFile(samples)
     val families = pedFile.groupByFamilies
     families.keySet shouldBe Set("f1", "f2")
 
@@ -45,7 +50,7 @@ class PedigreeFileTest extends BiopetTest {
 
   @Test
   def testGroupByPhenotype(): Unit = {
-    val pedFile = PedigreeFile(samples)
+    val pedFile = new PedigreeFile(samples)
     val families = pedFile.groupByPhenotype
     families.keySet shouldBe Set(Phenotype.Unaffected, Phenotype.Affected, Phenotype.Missing)
 

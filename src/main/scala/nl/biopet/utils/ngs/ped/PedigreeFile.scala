@@ -6,25 +6,31 @@ import nl.biopet.utils.ngs.ped
 
 import scala.io.Source
 
-case class PedigreeFile(samples: List[PedigreeSample]) {
+case class PedigreeFile(samples: Map[String, PedigreeSample]) {
+  def this(s: List[PedigreeSample]) {
+    this(s.map(sample => sample.sampleId -> sample).toMap)
+  }
+
   def groupByFamilies: Map[String, List[PedigreeSample]] =
-    samples.groupBy(_.familyId)
+    samples.values.toList.groupBy(_.familyId)
 
   def groupByPhenotype: Map[ped.Phenotype.Value, List[PedigreeSample]] =
-    samples.groupBy(_.phenotype)
+    samples.values.toList.groupBy(_.phenotype)
 
   def writeToFile(file: File): Unit = {
     val writer = new PrintWriter(file)
-    samples.foreach(s => writer.println(s.toPedLine))
+    samples.values.foreach(s => writer.println(s.toPedLine))
     writer.close()
   }
 
-  def +(other: PedigreeFile) = PedigreeFile(this.samples ::: other.samples)
+  def apply(id: String) = samples(id)
+
+  def +(other: PedigreeFile) = new PedigreeFile(this.samples ++ other.samples)
 }
 
 object PedigreeFile {
   def fromFile(file: File): PedigreeFile = {
-    PedigreeFile(
+    new PedigreeFile(
       Source.fromFile(file).getLines().map(PedigreeSample.fromLine).toList)
   }
 }
