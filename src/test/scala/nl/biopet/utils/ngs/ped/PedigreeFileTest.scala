@@ -15,7 +15,7 @@ class PedigreeFileTest extends BiopetTest {
   )
 
   @Test
-  def testFiles(): Unit = {
+  def testFile(): Unit = {
     val pedFile = PedigreeFile(samples)
     val file = File.createTempFile("test.", ".ped")
     file.deleteOnExit()
@@ -23,6 +23,14 @@ class PedigreeFileTest extends BiopetTest {
 
     val pedFile2 = PedigreeFile.fromFile(file)
     pedFile shouldBe pedFile2
+  }
+
+  @Test
+  def testFiles(): Unit = {
+    val pedFile = PedigreeFile(samples)
+    val pedFile2 = pedFile + pedFile
+    pedFile.samples.size shouldBe 4
+    pedFile2.samples.size shouldBe 8
   }
 
   @Test

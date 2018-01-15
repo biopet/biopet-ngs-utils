@@ -18,6 +18,8 @@ case class PedigreeFile(samples: List[PedigreeSample]) {
     samples.foreach(s => writer.println(s.toPedLine))
     writer.close()
   }
+
+  def +(other: PedigreeFile) = PedigreeFile(this.samples ::: other.samples)
 }
 
 object PedigreeFile {
