@@ -11,10 +11,10 @@ case class PedigreeFile(samples: Map[String, PedigreeSample]) {
     this(s.map(sample => sample.sampleId -> sample).toMap)
   }
 
-  def groupByFamilies: Map[String, List[PedigreeSample]] =
+  lazy val groupByFamilies: Map[String, List[PedigreeSample]] =
     samples.values.toList.groupBy(_.familyId)
 
-  def groupByPhenotype: Map[ped.Phenotype.Value, List[PedigreeSample]] =
+  lazy val groupByPhenotype: Map[ped.Phenotype.Value, List[PedigreeSample]] =
     samples.values.toList.groupBy(_.phenotype)
 
   def writeToFile(file: File): Unit = {
