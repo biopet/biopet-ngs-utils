@@ -12,4 +12,4 @@ scalaVersion := "2.11.11"
 libraryDependencies += "com.github.biopet" %% "CommonUtils" % "0.3-SNAPSHOT" changing()
 libraryDependencies += "com.github.samtools" % "htsjdk" % "2.14.1"
 
-libraryDependencies += "com.github.biopet" %% "test-utils" % "0.2" % Test
+libraryDependencies += "com.github.biopet" %% "TestUtils" % "0.3-SNAPSHOT" % Test changing()
