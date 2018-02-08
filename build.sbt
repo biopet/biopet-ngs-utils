@@ -1,4 +1,5 @@
 organization := "com.github.biopet"
+organizationName := "Biopet"
 name := "ngs-utils"
 
 biopetUrlName := "ngs-utils"
