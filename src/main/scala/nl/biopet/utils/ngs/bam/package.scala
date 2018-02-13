@@ -8,12 +8,9 @@ import htsjdk.samtools.{
   SamReader,
   SamReaderFactory
 }
-import nl.biopet.utils.ngs.intervals.{BedRecord, BedRecordList}
-
-import scala.collection.mutable
-import scala.collection.parallel.immutable
 
 import scala.collection.JavaConversions._
+import scala.collection.parallel.immutable
 
 package object bam {
 
