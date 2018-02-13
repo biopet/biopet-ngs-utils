@@ -293,20 +293,20 @@ class BamUtilsTest extends BiopetTest {
 }
 
 object BamUtilsTest {
-  var singleEndBam01: File = File.createTempFile("bamutils", "single01.bam")
+  val singleEndBam01: File = File.createTempFile("bamutils", "single01.bam")
   singleEndBam01.deleteOnExit()
-  var pairedEndBam01: File = File.createTempFile("bamutils", "paired01.bam")
+  val pairedEndBam01: File = File.createTempFile("bamutils", "paired01.bam")
   singleEndBam01.deleteOnExit()
-  var pairedEndBam02: File = File.createTempFile("bamutils", "paired02.bam")
+  val pairedEndBam02: File = File.createTempFile("bamutils", "paired02.bam")
   singleEndBam01.deleteOnExit()
 
-  var singleEndBam01WithDoubleSamples: File = File.createTempFile("bamutils", "single01ds.bam")
+  val singleEndBam01WithDoubleSamples: File = File.createTempFile("bamutils", "single01ds.bam")
   singleEndBam01WithDoubleSamples.deleteOnExit()
-  var pairedEndBam01WithDoubleSamples: File = File.createTempFile("bamutils", "paired01ds.bam")
+  val pairedEndBam01WithDoubleSamples: File = File.createTempFile("bamutils", "paired01ds.bam")
   pairedEndBam01WithDoubleSamples.deleteOnExit()
 
-  var singleEndBam01NoRG: File = File.createTempFile("bamutils", "single01norg.bam")
+  val singleEndBam01NoRG: File = File.createTempFile("bamutils", "single01norg.bam")
   singleEndBam01NoRG.deleteOnExit()
-  var pairedEndBam01NoRG: File = File.createTempFile("bamutils", "paired01norg.bam")
+  val pairedEndBam01NoRG: File = File.createTempFile("bamutils", "paired01norg.bam")
   singleEndBam01NoRG.deleteOnExit()
 }

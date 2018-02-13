@@ -63,17 +63,37 @@ object Feature {
     require(values.size == 9 || values.size == 8,
             s"A Gtf line should have 8 or 9 columns, gtf line: '$line'")
 
-    val strand = values(6) match {
-      case "+" => Some(true)
-      case "-" => Some(false)
-      case "." => None
-      case _ =>
-        throw new IllegalArgumentException(
-          s"strand only allows '+' or '-', not ${values(6)}, gtf line: $line")
-    }
+    Feature(
+      values(0),
+      values(1),
+      values(2),
+      values(3).toInt,
+      values(4).toInt,
+      parseScore(values(5)),
+      parseStrand(values(6)),
+      parseFrame(values(7)),
+      parseAttributes(values.lift(8))
+    )
+  }
 
-    val attributes = values
-      .lift(8)
+  def parseStrand(value: String): Option[Boolean] = value match {
+    case "+" => Some(true)
+    case "-" => Some(false)
+    case "." => None
+    case _ =>
+      throw new IllegalArgumentException(
+        s"strand only allows '+' or '-', not $value")
+  }
+
+  def parseFrame(value: String): Option[Char] = value match {
+    case "."                        => None
+    case s: String if s.length == 1 => Some(s.head)
+    case s =>
+      throw new IllegalArgumentException(s"'$s' can not be parsed as frame")
+  }
+
+  def parseAttributes(value: Option[String]): Map[String, String] =
+    value
       .map(_.split(";"))
       .getOrElse(Array())
       .map(_.trim)
@@ -81,8 +101,9 @@ object Feature {
       .map(parseAttribute)
       .toMap
 
-    val score = try {
-      values(5) match {
+  def parseScore(value: String): Option[Double] =
+    try {
+      value match {
         case "."       => None
         case s: String => Some(s.toDouble)
       }
@@ -90,25 +111,6 @@ object Feature {
       case e: NumberFormatException =>
         throw new IllegalStateException("Score in a gtf line must be number", e)
     }
-
-    val frame = values(7) match {
-      case "."                        => None
-      case s: String if s.length == 1 => Some(s.head)
-      case s =>
-        throw new IllegalArgumentException(
-          s"'$s' can not be parsed as frame, gtf line: $line")
-    }
-
-    Feature(values(0),
-            values(1),
-            values(2),
-            values(3).toInt,
-            values(4).toInt,
-            score,
-            strand,
-            frame,
-            attributes)
-  }
 
   def parseAttribute(att: String): (String, String) = {
     att match {

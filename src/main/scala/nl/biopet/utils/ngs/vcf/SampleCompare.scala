@@ -68,14 +68,13 @@ class SampleCompare(header: VCFHeader) extends Serializable {
           .map(record.getAlleleIndex)
           .toList)
 
-    for (sample1 <- compareSamples; sample2 <- compareSamples) {
-      if (alleles(sample1._2) == alleles(sample2._2)) {
-        genotypesCounts(sample1._2)(sample2._2) += 1
-        allelesCounts(sample1._2)(sample2._2) += alleles(sample1._2).size()
+    for ((_, sample1) <- compareSamples; (_, sample2) <- compareSamples) {
+      if (alleles(sample1) == alleles(sample2)) {
+        genotypesCounts(sample1)(sample2) += 1
+        allelesCounts(sample1)(sample2) += alleles(sample1).size()
       } else {
-        allelesCounts(sample1._2)(sample2._2) += alleleIndexOverlap(
-          alleles(sample1._2),
-          alleles(sample2._2))
+        allelesCounts(sample1)(sample2) += alleleIndexOverlap(alleles(sample1),
+                                                              alleles(sample2))
       }
     }
   }

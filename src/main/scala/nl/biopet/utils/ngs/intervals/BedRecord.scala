@@ -46,9 +46,7 @@ case class BedRecord(
   }
 
   def overlapWith(record: BedRecord): Boolean = {
-    if (chr != record.chr) false
-    else if (start < record.end && record.start < end) true
-    else false
+    chr == record.chr && start < record.end && record.start < end
   }
 
   def length: Int = end - start

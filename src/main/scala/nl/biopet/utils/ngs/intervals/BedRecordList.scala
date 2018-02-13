@@ -147,7 +147,7 @@ case class BedRecordList(chrRecords: Map[String, List[BedRecord]],
 
   def validateContigs(dict: SAMSequenceDictionary): BedRecordList = {
     val notExisting =
-      chrRecords.keys.filter(dict.getSequence(_) == null).toList
+      chrRecords.keys.filter(x => Option(dict.getSequence(x)).isEmpty).toList
     require(
       notExisting.isEmpty,
       s"Contigs found in bed records but are not existing in reference: ${notExisting
@@ -232,18 +232,23 @@ object BedRecordList {
     val all = reader.getLines().toList
     val header =
       all.takeWhile(x => x.startsWith("browser") || x.startsWith("track"))
-    var lineCount = header.length
-    val content = all.drop(lineCount)
+    val headerLength = header.length
     try {
-      fromListWithHeader(content.map(line => {
-        lineCount += 1
-        BedRecord.fromLine(line).validate
-      }), header)
-    } catch {
-      case e: Exception =>
-        Logging.logger.warn(
-          s"Parsing line number $lineCount failed on file: ${bedFile.getAbsolutePath}")
-        throw e
+      fromListWithHeader(
+        all.zipWithIndex.drop(headerLength).map {
+          case (line, idx) => {
+            try {
+              BedRecord.fromLine(line).validate
+            } catch {
+              case e: Exception =>
+                throw new IllegalStateException(
+                  s"Parsing line number ${idx + 1} failed on file: ${bedFile.getAbsolutePath}",
+                  e)
+            }
+          }
+        },
+        header
+      )
     } finally {
       reader.close()
     }

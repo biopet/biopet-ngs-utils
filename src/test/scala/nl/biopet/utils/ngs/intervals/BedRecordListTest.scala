@@ -141,7 +141,7 @@ class BedRecordListTest extends TestNGSuite with Matchers {
   }
 
   @Test def testErrors(): Unit = {
-    intercept[IllegalArgumentException] {
+    intercept[IllegalStateException] {
       BedRecordList.fromFile(BedRecordListTest.corruptBedFile)
     }
   }
