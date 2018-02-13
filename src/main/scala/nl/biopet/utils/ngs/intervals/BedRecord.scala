@@ -75,7 +75,7 @@ case class BedRecord(
       Some(for (i <- 0 until blockCount.get) yield {
         val exonNumber = strand match {
           case Some(false) => blockCount.get - i
-          case _ => i + 1
+          case _           => i + 1
         }
         BedRecord(chr,
                   start + blockStarts(i),
@@ -90,7 +90,7 @@ case class BedRecord(
       Some(for (i <- 0 until (blockCount.get - 1)) yield {
         val intronNumber = strand match {
           case Some(false) => blockCount.get - i
-          case _ => i + 1
+          case _           => i + 1
         }
         BedRecord(chr,
                   start + blockStarts(i) + blockSizes(i),
@@ -165,7 +165,7 @@ case class BedRecord(
     case (Some(name), Some(strand)) =>
       new Interval(chr, start + 1, end, !strand, name)
     case (Some(name), _) => new Interval(chr, start + 1, end, false, name)
-    case _ => new Interval(chr, start + 1, end)
+    case _               => new Interval(chr, start + 1, end)
   }
 }
 

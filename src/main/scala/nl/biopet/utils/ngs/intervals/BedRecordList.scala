@@ -94,9 +94,8 @@ case class BedRecordList(chrRecords: Map[String, List[BedRecord]],
       for ((chr, records) <- sorted.chrRecords)
         yield
           chr -> {
-            def combineOverlap(
-                records: List[BedRecord],
-                newRecords: ListBuffer[BedRecord] = ListBuffer())
+            def combineOverlap(records: List[BedRecord],
+                               newRecords: ListBuffer[BedRecord] = ListBuffer())
               : List[BedRecord] = {
               if (records.nonEmpty) {
                 val chr = records.head.chr
@@ -217,7 +216,8 @@ object BedRecordList {
     * @param combine When true overlaping regions are merged
     * @return
     */
-  def fromFiles(bedFiles: Seq[File], combine: Boolean = false): BedRecordList = {
+  def fromFiles(bedFiles: Seq[File],
+                combine: Boolean = false): BedRecordList = {
     val list = bedFiles.foldLeft(empty)((a, b) =>
       fromList(fromFile(b).allRecords ++ a.allRecords))
     if (combine) list.combineOverlap

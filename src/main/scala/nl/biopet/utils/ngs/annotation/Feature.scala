@@ -27,9 +27,9 @@ case class Feature(contig: String,
       end,
       score.getOrElse("."),
       strand match {
-        case Some(true) => "+"
+        case Some(true)  => "+"
         case Some(false) => "-"
-        case None => "."
+        case None        => "."
       },
       frame.getOrElse("."),
       attributes.map(x => x._1 + s""" "${x._2}"""").mkString("; ")
@@ -44,9 +44,9 @@ case class Feature(contig: String,
       end,
       score.getOrElse("."),
       strand match {
-        case Some(true) => "+"
+        case Some(true)  => "+"
         case Some(false) => "-"
-        case None => "."
+        case None        => "."
       },
       frame.getOrElse("."),
       attributes.map(x => x._1 + s"=${x._2}").mkString(";")
@@ -83,17 +83,16 @@ object Feature {
 
     val score = try {
       values(5) match {
-        case "." => None
+        case "."       => None
         case s: String => Some(s.toDouble)
       }
     } catch {
       case e: NumberFormatException =>
-        throw new IllegalStateException("Score in a gtf line must be number",
-                                        e)
+        throw new IllegalStateException("Score in a gtf line must be number", e)
     }
 
     val frame = values(7) match {
-      case "." => None
+      case "."                        => None
       case s: String if s.length == 1 => Some(s.head)
       case s =>
         throw new IllegalArgumentException(
