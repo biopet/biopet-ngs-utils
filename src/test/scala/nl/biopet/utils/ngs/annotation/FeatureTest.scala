@@ -23,7 +23,7 @@ class FeatureTest extends BiopetTest {
 
     intercept[IllegalArgumentException] {
       Feature.fromLine("chr1\tHAVANA\tgene\t11869\t14412\t.\t%\t.")
-    }.getMessage should startWith("strand only allows '+' or '-', not %, gtf line: ")
+    }.getMessage should startWith("strand only allows '+' or '-', not %")
 
     Feature.fromLine("chr1\tHAVANA\tgene\t11869\t14412\t.\t+\t1").frame shouldBe Some('1')
     Feature.fromLine("chr1\tHAVANA\tgene\t11869\t14412\t.\t-\t2").frame shouldBe Some('2')
@@ -31,7 +31,7 @@ class FeatureTest extends BiopetTest {
 
     intercept[IllegalArgumentException] {
       Feature.fromLine("chr1\tHAVANA\tgene\t11869\t14412\t.\t.\tto_long")
-    }.getMessage  should startWith("'to_long' can not be parsed as frame, gtf line:")
+    }.getMessage  should startWith("'to_long' can not be parsed as frame")
 
 
     val line = "chr1\tHAVANA\tgene\t11869\t14412\t.\t+\t.\tgene_id \"ENSG00000223972.4\"; havana_gene \"OTTHUMG00000000961.2\"; gene_status \"KNOWN\"; gene_name \"DDX11L1\"; transcript_id \"ENSG00000223972.4\"; gene_type \"pseudogene\"; transcript_type \"pseudogene\"; transcript_name \"DDX11L1\"; transcript_status \"KNOWN\"; level \"2\""
