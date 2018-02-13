@@ -20,12 +20,12 @@ object PedigreeSample {
     val gender: Gender.Value = values(4) match {
       case "1" => Gender.Male
       case "2" => Gender.Female
-      case _ => Gender.Unknown
+      case _   => Gender.Unknown
     }
     val phenotype: Phenotype.Value = values(5) match {
       case "1" => Phenotype.Unaffected
       case "2" => Phenotype.Affected
-      case _ => Phenotype.Missing
+      case _   => Phenotype.Missing
 
     }
     PedigreeSample(values(0),

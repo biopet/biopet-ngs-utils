@@ -27,8 +27,7 @@ package object vcf {
   /**
     * @deprecated Moved to nl.biopet.utils.conversions
     */
-  def scalaListToJavaObjectArrayList(
-      array: List[Any]): util.ArrayList[Object] =
+  def scalaListToJavaObjectArrayList(array: List[Any]): util.ArrayList[Object] =
     conversions.scalaListToJavaObjectArrayList(array)
 
   /**
@@ -57,8 +56,7 @@ package object vcf {
     if (name.endsWith(".vcf")) new File(name + ".idx")
     else if (name.endsWith(".vcf.gz")) new File(name + ".tbi")
     else
-      throw new IllegalArgumentException(
-        s"File given is no vcf file: $vcfFile")
+      throw new IllegalArgumentException(s"File given is no vcf file: $vcfFile")
   }
 
   def vcfFileIsEmpty(file: File): Boolean = {
@@ -147,9 +145,8 @@ package object vcf {
       * @param method methods to apply on list, default returns all values
       * @return
       */
-    def getAttAsString(
-        key: String,
-        method: FieldMethod.Value = FieldMethod.All.asInstanceOf)
+    def getAttAsString(key: String,
+                       method: FieldMethod.Value = FieldMethod.All.asInstanceOf)
       : List[String] = {
       val value =
         if (record.hasAttribute(key))
@@ -188,9 +185,8 @@ package object vcf {
       * @param method methods to apply on list, default returns all values
       * @return
       */
-    def getAttAsString(
-        key: String,
-        method: FieldMethod.Value = FieldMethod.All.asInstanceOf)
+    def getAttAsString(key: String,
+                       method: FieldMethod.Value = FieldMethod.All.asInstanceOf)
       : List[String] = {
       val value =
         if (genotype.hasAnyAttribute(key))
