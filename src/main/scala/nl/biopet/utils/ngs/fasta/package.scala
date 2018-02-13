@@ -6,6 +6,7 @@ import htsjdk.samtools.SAMSequenceDictionary
 import htsjdk.samtools.reference.{FastaSequenceFile, IndexedFastaSequenceFile}
 
 import scala.collection.JavaConversions._
+import scala.collection.mutable
 import scala.io.Source
 
 package object fasta {
@@ -24,11 +25,12 @@ package object fasta {
     dict
   }
 
-  private var dictCache: Map[File, SAMSequenceDictionary] = Map()
+  private val dictCache: mutable.Map[File, SAMSequenceDictionary] =
+    mutable.Map()
 
   /** This will clear the dict cache */
   def clearCache(): Unit = {
-    dictCache = Map()
+    dictCache.clear()
   }
 
   /**

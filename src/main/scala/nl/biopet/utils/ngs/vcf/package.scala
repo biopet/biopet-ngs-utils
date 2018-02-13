@@ -36,7 +36,7 @@ package object vcf {
     * @return boolean
     */
   def isBlockGVcf(header: VCFHeader): Boolean = {
-    header.getMetaDataLine("GVCFBlock") != null
+    Option(header.getMetaDataLine("GVCFBlock")).isDefined
   }
 
   /**

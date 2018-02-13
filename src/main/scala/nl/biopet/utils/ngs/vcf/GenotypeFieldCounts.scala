@@ -21,8 +21,8 @@ class GenotypeFieldCounts(header: VCFHeader,
   protected[GenotypeFieldCounts] val counts: Map[Int, Counts[String]] =
     samples.map(_._2 -> new Counts[String]())
 
-  protected var _noValue: Array[Long] = Array.fill(samples.size)(0L)
-  protected var _total: Array[Long] = Array.fill(samples.size)(0L)
+  protected val _noValue: Array[Long] = Array.fill(samples.size)(0L)
+  protected val _total: Array[Long] = Array.fill(samples.size)(0L)
 
   /** Returns per sample the number of records without the field */
   def noValue: Map[String, Long] = samples.map(x => x._1 -> _noValue(x._2))
