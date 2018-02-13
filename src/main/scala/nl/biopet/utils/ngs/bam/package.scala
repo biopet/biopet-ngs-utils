@@ -79,7 +79,7 @@ package object bam {
     * Estimate the insertsize of fragments within the given contig.
     * Uses the properly paired reads according to flags set by the aligner
     *
-    * @deprecated Please use [[nl.biopet.utils.ngs.bam.InsertsizeEstimate.contigInsertSize]]
+    * @deprecated Please use [[nl.biopet.utils.ngs.bam.InsertsizeEstimate.regionsInsertSize]]
     */
   def contigInsertSize(inputBam: File,
                        contig: String,
@@ -87,12 +87,12 @@ package object bam {
                        end: Int,
                        samplingSize: Int = 10000,
                        binSize: Int = 1000000): Option[Int] =
-    InsertsizeEstimate.contigInsertSize(inputBam,
-                                        contig,
-                                        start,
-                                        end,
-                                        samplingSize,
-                                        binSize)
+    InsertsizeEstimate.regionsInsertSize(inputBam,
+                                         contig,
+                                         start,
+                                         end,
+                                         samplingSize,
+                                         binSize)
 
   /**
     * Estimate the insertsize for one single bamfile and return the insertsize
