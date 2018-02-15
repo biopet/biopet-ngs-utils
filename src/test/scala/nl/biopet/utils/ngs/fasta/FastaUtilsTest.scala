@@ -27,19 +27,24 @@ class FastaUtilsTest extends BiopetTest {
   @Test
   def testRebuildContigMapReal(): Unit = {
     val inputFile: File = resourceFile("/H.sapiens-GRCh37.contig.map.tsv")
-    val referenceFile: File = resourceFile("/fake_GRCh37.p13_no_alt_analysis_set.fa")
+    val referenceFile: File = resourceFile(
+      "/fake_GRCh37.p13_no_alt_analysis_set.fa")
 
     val map = fasta.rebuildContigMap(inputFile, referenceFile)
 
-    map("chr11_GL000202_random") shouldBe Set("HSCHR11_RANDOM_CTG2","GL000202.1", "NT_113921.2")
+    map("chr11_GL000202_random") shouldBe Set("HSCHR11_RANDOM_CTG2",
+                                              "GL000202.1",
+                                              "NT_113921.2")
   }
 
   @Test
   def testRebuildContigMapCaseSensitive(): Unit = {
     val inputFile: File = resourceFile("/H.sapiens-GRCh37.contig.map.tsv")
-    val referenceFile: File = resourceFile("/fake_GRCh37.p13_no_alt_analysis_set.fa")
+    val referenceFile: File = resourceFile(
+      "/fake_GRCh37.p13_no_alt_analysis_set.fa")
 
-    val map = fasta.rebuildContigMap(inputFile, referenceFile, caseSentive = true)
+    val map =
+      fasta.rebuildContigMap(inputFile, referenceFile, caseSentive = true)
 
     map("chr11_GL000202_random") shouldBe Set()
   }

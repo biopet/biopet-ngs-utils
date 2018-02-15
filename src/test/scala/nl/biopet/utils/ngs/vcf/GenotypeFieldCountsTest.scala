@@ -14,23 +14,35 @@ class GenotypeFieldCountsTest extends BiopetTest {
   def testNonExist(): Unit = {
     val reader = new VCFFileReader(resourceFile("/multi.vcf"), false)
     val header = reader.getFileHeader
-    val stats = new GenotypeFieldCounts(header, header.getFormatHeaderLine("EMPTY"), FieldMethod.All)
+    val stats = new GenotypeFieldCounts(header,
+                                        header.getFormatHeaderLine("EMPTY"),
+                                        FieldMethod.All)
     reader.foreach(stats.addRecord(_))
     reader.close()
 
     stats.total shouldBe Map("Sample_3" -> 4, "Sample_2" -> 4, "Sample_1" -> 4)
-    stats.noValue shouldBe Map("Sample_3" -> 4, "Sample_2" -> 4, "Sample_1" -> 4)
-    stats.countsMap shouldBe Map("Sample_3" -> Map(), "Sample_2" -> Map(), "Sample_1" -> Map())
+    stats.noValue shouldBe Map("Sample_3" -> 4,
+                               "Sample_2" -> 4,
+                               "Sample_1" -> 4)
+    stats.countsMap shouldBe Map("Sample_3" -> Map(),
+                                 "Sample_2" -> Map(),
+                                 "Sample_1" -> Map())
 
     stats += stats
     stats.total shouldBe Map("Sample_3" -> 8, "Sample_2" -> 8, "Sample_1" -> 8)
-    stats.noValue shouldBe Map("Sample_3" -> 8, "Sample_2" -> 8, "Sample_1" -> 8)
-    stats.countsMap shouldBe Map("Sample_3" -> Map(), "Sample_2" -> Map(), "Sample_1" -> Map())
+    stats.noValue shouldBe Map("Sample_3" -> 8,
+                               "Sample_2" -> 8,
+                               "Sample_1" -> 8)
+    stats.countsMap shouldBe Map("Sample_3" -> Map(),
+                                 "Sample_2" -> Map(),
+                                 "Sample_1" -> Map())
   }
 
   @DataProvider(name = "inCorrectMethod")
   def inCorrectMethod: Array[Array[FieldMethod.Value]] = {
-    Array(Array(FieldMethod.Max), Array(FieldMethod.Min), Array(FieldMethod.Avg))
+    Array(Array(FieldMethod.Max),
+          Array(FieldMethod.Min),
+          Array(FieldMethod.Avg))
   }
 
   @Test(dataProvider = "inCorrectMethod")
@@ -43,7 +55,9 @@ class GenotypeFieldCountsTest extends BiopetTest {
     reader.close()
 
     stats.total shouldBe Map("Sample_3" -> 4, "Sample_2" -> 4, "Sample_1" -> 4)
-    stats.noValue shouldBe Map("Sample_3" -> 1, "Sample_2" -> 1, "Sample_1" -> 1)
+    stats.noValue shouldBe Map("Sample_3" -> 1,
+                               "Sample_2" -> 1,
+                               "Sample_1" -> 1)
     stats.countsMap shouldBe Map(
       "Sample_3" -> Map("5.0" -> 3),
       "Sample_2" -> Map("5.0" -> 2, "1.0" -> 1),
@@ -67,12 +81,15 @@ class GenotypeFieldCountsTest extends BiopetTest {
   def testCorrect(method: FieldMethod.Value): Unit = {
     val reader = new VCFFileReader(resourceFile("/multi.vcf"), false)
     val header = reader.getFileHeader
-    val stats = new GenotypeFieldCounts(header, header.getFormatHeaderLine("DP"), method)
+    val stats =
+      new GenotypeFieldCounts(header, header.getFormatHeaderLine("DP"), method)
     reader.foreach(stats.addRecord(_))
     reader.close()
 
     stats.total shouldBe Map("Sample_3" -> 4, "Sample_2" -> 4, "Sample_1" -> 4)
-    stats.noValue shouldBe Map("Sample_3" -> 1, "Sample_2" -> 1, "Sample_1" -> 1)
+    stats.noValue shouldBe Map("Sample_3" -> 1,
+                               "Sample_2" -> 1,
+                               "Sample_1" -> 1)
     stats.countsMap shouldBe Map(
       "Sample_3" -> Map("5" -> 3),
       "Sample_2" -> Map("5" -> 2, "1" -> 1),

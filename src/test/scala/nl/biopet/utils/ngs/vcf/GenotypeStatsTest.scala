@@ -25,12 +25,13 @@ class GenotypeStatsTest extends BiopetTest {
 
     val tempDir = Files.createTempDirectory("sampleCompare").toFile
     stats.writeToTsv(new File(tempDir, "genotype.tsv"))
-    val lines = Source.fromFile(new File(tempDir, "genotype.tsv")).getLines().toList
-    lines.head shouldBe stats.samples.keys.toList.sorted.mkString("Sample\t", "\t", "")
+    val lines =
+      Source.fromFile(new File(tempDir, "genotype.tsv")).getLines().toList
+    lines.head shouldBe stats.samples.keys.toList.sorted
+      .mkString("Sample\t", "\t", "")
     lines.map(_.split("\t")).map(_.length).distinct shouldBe List(4)
     GenotypeStats.values.foreach(s =>
-      require(lines.exists(_.startsWith(s.toString + "\t")), s"$s not found")
-    )
+      require(lines.exists(_.startsWith(s.toString + "\t")), s"$s not found"))
   }
 
   @Test
@@ -49,12 +50,13 @@ class GenotypeStatsTest extends BiopetTest {
 
     val tempDir = Files.createTempDirectory("sampleCompare").toFile
     stats.writeToTsv(new File(tempDir, "genotype.tsv"))
-    val lines = Source.fromFile(new File(tempDir, "genotype.tsv")).getLines().toList
-    lines.head shouldBe stats.samples.keys.toList.sorted.mkString("Sample\t", "\t", "")
+    val lines =
+      Source.fromFile(new File(tempDir, "genotype.tsv")).getLines().toList
+    lines.head shouldBe stats.samples.keys.toList.sorted
+      .mkString("Sample\t", "\t", "")
     lines.map(_.split("\t")).map(_.length).distinct shouldBe List(4)
     GenotypeStats.values.foreach(s =>
-      require(lines.exists(_.startsWith(s.toString + "\t")), s"$s not found")
-    )
+      require(lines.exists(_.startsWith(s.toString + "\t")), s"$s not found"))
   }
 
 }

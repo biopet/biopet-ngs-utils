@@ -73,17 +73,20 @@ class BedRecordListTest extends TestNGSuite with Matchers {
 
   @Test def testSorted(): Unit = {
     val unsorted =
-      BedRecordList.fromList(List(BedRecord("chrQ", 10, 20), BedRecord("chrQ", 0, 10)))
+      BedRecordList.fromList(
+        List(BedRecord("chrQ", 10, 20), BedRecord("chrQ", 0, 10)))
     unsorted.isSorted shouldBe false
     unsorted.sorted.isSorted shouldBe true
-    val sorted = BedRecordList.fromList(List(BedRecord("chrQ", 0, 10), BedRecord("chrQ", 10, 20)))
+    val sorted = BedRecordList.fromList(
+      List(BedRecord("chrQ", 0, 10), BedRecord("chrQ", 10, 20)))
     sorted.isSorted shouldBe true
     sorted.sorted.isSorted shouldBe true
     sorted.hashCode() shouldBe sorted.sorted.hashCode()
   }
 
   @Test def testOverlap(): Unit = {
-    val list = BedRecordList.fromList(List(BedRecord("chrQ", 0, 10), BedRecord("chrQ", 10, 20)))
+    val list = BedRecordList.fromList(
+      List(BedRecord("chrQ", 0, 10), BedRecord("chrQ", 10, 20)))
     list.overlapWith(BedRecord("chrQ", 5, 15)).size shouldBe 2
     list.overlapWith(BedRecord("chrQ", 0, 10)).size shouldBe 1
     list.overlapWith(BedRecord("chrQ", 10, 20)).size shouldBe 1
@@ -92,25 +95,30 @@ class BedRecordListTest extends TestNGSuite with Matchers {
   }
 
   @Test def testLength(): Unit = {
-    val list = BedRecordList.fromList(List(BedRecord("chrQ", 0, 10), BedRecord("chrQ", 10, 20)))
+    val list = BedRecordList.fromList(
+      List(BedRecord("chrQ", 0, 10), BedRecord("chrQ", 10, 20)))
     list.length shouldBe 20
   }
 
   @Test def testCombineOverlap(): Unit = {
     val noOverlapList =
-      BedRecordList.fromList(List(BedRecord("chrQ", 0, 10), BedRecord("chrQ", 10, 20)))
+      BedRecordList.fromList(
+        List(BedRecord("chrQ", 0, 10), BedRecord("chrQ", 10, 20)))
     noOverlapList.length shouldBe 20
     noOverlapList.combineOverlap.length shouldBe 20
 
     val overlapList = BedRecordList.fromList(
-      List(BedRecord("chrQ", 0, 10), BedRecord("chrQ", 5, 15), BedRecord("chrQ", 10, 20)))
+      List(BedRecord("chrQ", 0, 10),
+           BedRecord("chrQ", 5, 15),
+           BedRecord("chrQ", 10, 20)))
     overlapList.length shouldBe 30
     overlapList.combineOverlap.length shouldBe 20
   }
 
   @Test def testSquishBed(): Unit = {
     val noOverlapList =
-      BedRecordList.fromList(List(BedRecord("chrQ", 0, 10), BedRecord("chrQ", 10, 20)))
+      BedRecordList.fromList(
+        List(BedRecord("chrQ", 0, 10), BedRecord("chrQ", 10, 20)))
     noOverlapList.length shouldBe 20
     noOverlapList.squishBed().length shouldBe 20
 
@@ -124,20 +132,23 @@ class BedRecordListTest extends TestNGSuite with Matchers {
         BedRecord("chrQ", 60, 70)
       ))
     overlapList.length shouldBe 80
-    val squishedList = overlapList.squishBed(strandSensitive = false, nameSensitive = false)
+    val squishedList =
+      overlapList.squishBed(strandSensitive = false, nameSensitive = false)
     squishedList.allRecords.size shouldBe 5
     squishedList.length shouldBe 40
   }
 
   @Test def testSamInterval(): Unit = {
-    val list = BedRecordList.fromList(List(BedRecord("chrQ", 0, 10), BedRecord("chrQ", 5, 15)))
+    val list = BedRecordList.fromList(
+      List(BedRecord("chrQ", 0, 10), BedRecord("chrQ", 5, 15)))
     list.toSamIntervals.toList shouldBe List(new Interval("chrQ", 1, 10),
                                              new Interval("chrQ", 6, 15))
   }
 
   @Test def testTraversable(): Unit = {
     val list = List(BedRecord("chrQ", 0, 10))
-    BedRecordList.fromList(list) shouldBe BedRecordList.fromList(list.toIterator)
+    BedRecordList.fromList(list) shouldBe BedRecordList.fromList(
+      list.toIterator)
   }
 
   @Test def testErrors(): Unit = {
@@ -167,9 +178,11 @@ object BedRecordListTest {
                      |browser hide all
                      |track name="ItemRGBDemo" description="Item RGB demonstration" visibility=2 itemRgb="On"
                      |""".stripMargin
-  val bedContent: String = """chr22	1000	5000	cloneA	960	+	1000	5000	0	2	567,488	0,3512
+  val bedContent: String =
+    """chr22	1000	5000	cloneA	960	+	1000	5000	0	2	567,488	0,3512
                   |chr22	2000	6000	cloneB	900	-	2000	6000	0	2	433,399	0,3601""".stripMargin
-  val corruptBedContent: String = """chr22	5000	1000	cloneA	960	+	1000	5000	0	2	567,488	0,3512
+  val corruptBedContent: String =
+    """chr22	5000	1000	cloneA	960	+	1000	5000	0	2	567,488	0,3512
                      |chr22	2000	6000	cloneB	900	-	2000	6000	0	2	433,399	0,3601""".stripMargin
 
   val bedFile: File = File.createTempFile("regions", ".bed")

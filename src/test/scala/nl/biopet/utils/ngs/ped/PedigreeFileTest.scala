@@ -21,7 +21,12 @@ class PedigreeFileTest extends BiopetTest {
     file.deleteOnExit()
     pedFile.writeToFile(file)
 
-    pedFile("s4") shouldBe PedigreeSample("f2", "s4", "", "", Gender.Male, Phenotype.Missing)
+    pedFile("s4") shouldBe PedigreeSample("f2",
+                                          "s4",
+                                          "",
+                                          "",
+                                          Gender.Male,
+                                          Phenotype.Missing)
 
     val pedFile2 = PedigreeFile.fromFile(file)
     pedFile shouldBe pedFile2
@@ -30,7 +35,8 @@ class PedigreeFileTest extends BiopetTest {
   @Test
   def testFiles(): Unit = {
     val pedFile1 = new PedigreeFile(samples)
-    val pedFile2 = new PedigreeFile(PedigreeSample("f2", "s5", "", "", Gender.Male, Phenotype.Missing) :: Nil)
+    val pedFile2 = new PedigreeFile(
+      PedigreeSample("f2", "s5", "", "", Gender.Male, Phenotype.Missing) :: Nil)
 
     val combinedPedFile = pedFile1 + pedFile2
     pedFile1.samples.size shouldBe 4
@@ -52,10 +58,15 @@ class PedigreeFileTest extends BiopetTest {
   def testGroupByPhenotype(): Unit = {
     val pedFile = new PedigreeFile(samples)
     val families = pedFile.groupByPhenotype
-    families.keySet shouldBe Set(Phenotype.Unaffected, Phenotype.Affected, Phenotype.Missing)
+    families.keySet shouldBe Set(Phenotype.Unaffected,
+                                 Phenotype.Affected,
+                                 Phenotype.Missing)
 
-    families(Phenotype.Unaffected) shouldBe samples.filter(_.phenotype == Phenotype.Unaffected)
-    families(Phenotype.Affected) shouldBe samples.filter(_.phenotype == Phenotype.Affected)
-    families(Phenotype.Missing) shouldBe samples.filter(_.phenotype == Phenotype.Missing)
+    families(Phenotype.Unaffected) shouldBe samples.filter(
+      _.phenotype == Phenotype.Unaffected)
+    families(Phenotype.Affected) shouldBe samples.filter(
+      _.phenotype == Phenotype.Affected)
+    families(Phenotype.Missing) shouldBe samples.filter(
+      _.phenotype == Phenotype.Missing)
   }
 }

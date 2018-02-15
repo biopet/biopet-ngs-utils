@@ -33,7 +33,8 @@ class InfoFieldCountsTest extends BiopetTest {
   def testMax(): Unit = {
     val reader = new VCFFileReader(resourceFile("/multi.vcf"), false)
     val header = reader.getFileHeader
-    val stats = new InfoFieldCounts(header.getInfoHeaderLine("DP"), FieldMethod.Max)
+    val stats =
+      new InfoFieldCounts(header.getInfoHeaderLine("DP"), FieldMethod.Max)
     reader.foreach(stats.addRecord)
     reader.close()
 
@@ -51,7 +52,8 @@ class InfoFieldCountsTest extends BiopetTest {
   def testMin(): Unit = {
     val reader = new VCFFileReader(resourceFile("/multi.vcf"), false)
     val header = reader.getFileHeader
-    val stats = new InfoFieldCounts(header.getInfoHeaderLine("DP"), FieldMethod.Min)
+    val stats =
+      new InfoFieldCounts(header.getInfoHeaderLine("DP"), FieldMethod.Min)
     reader.foreach(stats.addRecord)
     reader.close()
 
@@ -69,25 +71,33 @@ class InfoFieldCountsTest extends BiopetTest {
   def testAvg(): Unit = {
     val reader = new VCFFileReader(resourceFile("/multi.vcf"), false)
     val header = reader.getFileHeader
-    val stats = new InfoFieldCounts(header.getInfoHeaderLine("DP"), FieldMethod.Avg)
+    val stats =
+      new InfoFieldCounts(header.getInfoHeaderLine("DP"), FieldMethod.Avg)
     reader.foreach(stats.addRecord)
     reader.close()
 
     stats.total shouldBe 4L
     stats.noValue shouldBe 0L
-    stats.countsMap shouldBe Map("1.0" -> 1, "1.3333333333333333" -> 1, "3.0" -> 1, "2.0" -> 1)
+    stats.countsMap shouldBe Map("1.0" -> 1,
+                                 "1.3333333333333333" -> 1,
+                                 "3.0" -> 1,
+                                 "2.0" -> 1)
 
     stats += stats
     stats.total shouldBe 8L
     stats.noValue shouldBe 0L
-    stats.countsMap shouldBe Map("1.0" -> 2, "1.3333333333333333" -> 2, "3.0" -> 2, "2.0" -> 2)
+    stats.countsMap shouldBe Map("1.0" -> 2,
+                                 "1.3333333333333333" -> 2,
+                                 "3.0" -> 2,
+                                 "2.0" -> 2)
   }
 
   @Test
   def testAll(): Unit = {
     val reader = new VCFFileReader(resourceFile("/multi.vcf"), false)
     val header = reader.getFileHeader
-    val stats = new InfoFieldCounts(header.getInfoHeaderLine("DP"), FieldMethod.All)
+    val stats =
+      new InfoFieldCounts(header.getInfoHeaderLine("DP"), FieldMethod.All)
     reader.foreach(stats.addRecord)
     reader.close()
 
@@ -116,7 +126,8 @@ class InfoFieldCountsTest extends BiopetTest {
   def testUnique(): Unit = {
     val reader = new VCFFileReader(resourceFile("/multi.vcf"), false)
     val header = reader.getFileHeader
-    val stats = new InfoFieldCounts(header.getInfoHeaderLine("DP"), FieldMethod.Unique)
+    val stats =
+      new InfoFieldCounts(header.getInfoHeaderLine("DP"), FieldMethod.Unique)
     reader.foreach(stats.addRecord)
     reader.close()
 

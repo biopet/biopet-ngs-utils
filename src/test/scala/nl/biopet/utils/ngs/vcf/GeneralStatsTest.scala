@@ -26,12 +26,14 @@ class GeneralStatsTest extends BiopetTest {
 
     val tempDir = Files.createTempDirectory("sampleCompare").toFile
     stats.writeToTsv(new File(tempDir, "general.tsv"))
-    val lines = Source.fromFile(new File(tempDir, "general.tsv")).getLines().toList
+    val lines =
+      Source.fromFile(new File(tempDir, "general.tsv")).getLines().toList
     lines.map(_.split("\t")).map(_.length).distinct shouldBe List(2)
     lines.head shouldBe "value\tcount"
-    GeneralStats.values.foreach(s =>
-      require(lines.exists(_.startsWith(s.toString + "\t")), s"${s.toString} not found")
-    )
+    GeneralStats.values.foreach(
+      s =>
+        require(lines.exists(_.startsWith(s.toString + "\t")),
+                s"${s.toString} not found"))
   }
 
   @Test
@@ -51,12 +53,12 @@ class GeneralStatsTest extends BiopetTest {
 
     val tempDir = Files.createTempDirectory("sampleCompare").toFile
     stats.writeToTsv(new File(tempDir, "general.tsv"))
-    val lines = Source.fromFile(new File(tempDir, "general.tsv")).getLines().toList
+    val lines =
+      Source.fromFile(new File(tempDir, "general.tsv")).getLines().toList
     lines.map(_.split("\t")).map(_.length).distinct shouldBe List(2)
     lines.head shouldBe "value\tcount"
     GeneralStats.values.foreach(s =>
-      require(lines.exists(_.startsWith(s.toString + "\t")), s"$s not found")
-    )
+      require(lines.exists(_.startsWith(s.toString + "\t")), s"$s not found"))
   }
 
 }

@@ -62,7 +62,8 @@ class BamUtilsTest extends BiopetTest {
     new SAMLineParser(samh)
   }
 
-  private def makeSams(header: SAMLineParser, raws: Seq[String]): Seq[SAMRecord] =
+  private def makeSams(header: SAMLineParser,
+                       raws: Seq[String]): Seq[SAMRecord] =
     raws.map(s => header.parseLine(s))
 
   val sBamRecs1 = Seq(
@@ -123,12 +124,14 @@ class BamUtilsTest extends BiopetTest {
                        samHeaderTemplateDoubleSample,
                        BamUtilsTest.pairedEndBam01WithDoubleSamples)
 
-    createTestFileFrom(makeSams(samHeaderTemplateErrornousNoReadgroup, sBamRecs2),
-                       samHeaderTemplateErrornousNoReadgroup,
-                       BamUtilsTest.singleEndBam01NoRG)
-    createTestFileFrom(makeSams(samHeaderTemplateErrornousNoReadgroup, pBamRecs2),
-                       samHeaderTemplateErrornousNoReadgroup,
-                       BamUtilsTest.pairedEndBam01NoRG)
+    createTestFileFrom(
+      makeSams(samHeaderTemplateErrornousNoReadgroup, sBamRecs2),
+      samHeaderTemplateErrornousNoReadgroup,
+      BamUtilsTest.singleEndBam01NoRG)
+    createTestFileFrom(
+      makeSams(samHeaderTemplateErrornousNoReadgroup, pBamRecs2),
+      samHeaderTemplateErrornousNoReadgroup,
+      BamUtilsTest.pairedEndBam01NoRG)
   }
 
   private def createTestFileFrom(records: Seq[SAMRecord],
@@ -170,7 +173,8 @@ class BamUtilsTest extends BiopetTest {
 
   @Test
   def testContigInsertsize(): Unit = {
-    contigInsertSize(BamUtilsTest.pairedEndBam01, "chrQ", 1, 10000) shouldBe Some(50)
+    contigInsertSize(BamUtilsTest.pairedEndBam01, "chrQ", 1, 10000) shouldBe Some(
+      50)
     contigInsertSize(BamUtilsTest.pairedEndBam01, "chrR", 1, 10000) shouldBe None
   }
 
@@ -241,7 +245,8 @@ class BamUtilsTest extends BiopetTest {
   @Test
   def testSampleFoundTwice(): Unit = {
     val thrown = intercept[IllegalArgumentException] {
-      sampleBamMap(List(BamUtilsTest.pairedEndBam01, BamUtilsTest.pairedEndBam02))
+      sampleBamMap(
+        List(BamUtilsTest.pairedEndBam01, BamUtilsTest.pairedEndBam02))
     }
     thrown.getMessage should ===("Samples has been found twice")
   }
@@ -257,7 +262,8 @@ class BamUtilsTest extends BiopetTest {
   @Test
   def testReadgroupReaders(): Unit = {
     val reader = SamReaderFactory.makeDefault.open(BamUtilsTest.pairedEndBam01)
-    val readgroups = sampleReadGroups(Map("sample01" -> (reader, BamUtilsTest.pairedEndBam01)))
+    val readgroups = sampleReadGroups(
+      Map("sample01" -> (reader, BamUtilsTest.pairedEndBam01)))
 
     readgroups.head._1 shouldBe "sample01"
     readgroups.map(_._2.size).sum shouldBe 2
@@ -265,11 +271,13 @@ class BamUtilsTest extends BiopetTest {
 
   @Test
   def testDictCheck(): Unit = {
-    val dict1 = nl.biopet.utils.ngs.fasta.getCachedDict(resourceFile("/fake_chrQ.fa"))
+    val dict1 =
+      nl.biopet.utils.ngs.fasta.getCachedDict(resourceFile("/fake_chrQ.fa"))
     dict1.getSequences.size() shouldBe 1
     dict1.getSequence("chrQ").getSequenceLength shouldBe 16571
 
-    val dict2 = nl.biopet.utils.ngs.fasta.getCachedDict(resourceFile("/fake_chrQ.fa"))
+    val dict2 =
+      nl.biopet.utils.ngs.fasta.getCachedDict(resourceFile("/fake_chrQ.fa"))
     dict1.hashCode() shouldBe dict2.hashCode()
     dict1.assertSameDictionary(dict2, true)
     dict1.assertSameDictionary(dict2, false)
@@ -300,13 +308,17 @@ object BamUtilsTest {
   val pairedEndBam02: File = File.createTempFile("bamutils", "paired02.bam")
   singleEndBam01.deleteOnExit()
 
-  val singleEndBam01WithDoubleSamples: File = File.createTempFile("bamutils", "single01ds.bam")
+  val singleEndBam01WithDoubleSamples: File =
+    File.createTempFile("bamutils", "single01ds.bam")
   singleEndBam01WithDoubleSamples.deleteOnExit()
-  val pairedEndBam01WithDoubleSamples: File = File.createTempFile("bamutils", "paired01ds.bam")
+  val pairedEndBam01WithDoubleSamples: File =
+    File.createTempFile("bamutils", "paired01ds.bam")
   pairedEndBam01WithDoubleSamples.deleteOnExit()
 
-  val singleEndBam01NoRG: File = File.createTempFile("bamutils", "single01norg.bam")
+  val singleEndBam01NoRG: File =
+    File.createTempFile("bamutils", "single01norg.bam")
   singleEndBam01NoRG.deleteOnExit()
-  val pairedEndBam01NoRG: File = File.createTempFile("bamutils", "paired01norg.bam")
+  val pairedEndBam01NoRG: File =
+    File.createTempFile("bamutils", "paired01norg.bam")
   singleEndBam01NoRG.deleteOnExit()
 }

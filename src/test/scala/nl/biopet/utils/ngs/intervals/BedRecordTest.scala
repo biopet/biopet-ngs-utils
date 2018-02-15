@@ -26,14 +26,22 @@ class BedRecordTest extends TestNGSuite with Matchers {
   @Test def testLineParse(): Unit = {
     BedRecord("chrQ", 0, 4) shouldBe BedRecord("chrQ", 0, 4)
     BedRecord.fromLine("chrQ\t0\t4") shouldBe BedRecord("chrQ", 0, 4)
-    BedRecord.fromLine("chrQ\t0\t4\tname\t3\t+") shouldBe BedRecord("chrQ",
-                                                                    0,
-                                                                    4,
-                                                                    Some("name"),
-                                                                    Some(3.0),
-                                                                    Some(true))
+    BedRecord.fromLine("chrQ\t0\t4\tname\t3\t+") shouldBe BedRecord(
+      "chrQ",
+      0,
+      4,
+      Some("name"),
+      Some(3.0),
+      Some(true))
     BedRecord.fromLine("chrQ\t0\t4\tname\t3\t+\t1\t3") shouldBe
-      BedRecord("chrQ", 0, 4, Some("name"), Some(3.0), Some(true), Some(1), Some(3))
+      BedRecord("chrQ",
+                0,
+                4,
+                Some("name"),
+                Some(3.0),
+                Some(true),
+                Some(1),
+                Some(3))
     BedRecord.fromLine("chrQ\t0\t4\tname\t3\t+\t1\t3\t255,0,0") shouldBe
       BedRecord("chrQ",
                 0,
@@ -44,7 +52,8 @@ class BedRecordTest extends TestNGSuite with Matchers {
                 Some(1),
                 Some(3),
                 Some((255, 0, 0)))
-    BedRecord.fromLine("chrQ\t0\t100\tname\t3\t+\t1\t3\t255,0,0\t2\t10,20\t20,50") shouldBe
+    BedRecord.fromLine(
+      "chrQ\t0\t100\tname\t3\t+\t1\t3\t255,0,0\t2\t10,20\t20,50") shouldBe
       BedRecord("chrQ",
                 0,
                 100,
@@ -94,9 +103,12 @@ class BedRecordTest extends TestNGSuite with Matchers {
   }
 
   @Test def testExons(): Unit = {
-    BedRecord.fromLine("chrQ\t0\t100\tname\t3\t+\t1\t3\t255,0,0").exons shouldBe None
+    BedRecord
+      .fromLine("chrQ\t0\t100\tname\t3\t+\t1\t3\t255,0,0")
+      .exons shouldBe None
 
-    val record = BedRecord.fromLine("chrQ\t0\t100\tname\t3\t+\t1\t3\t255,0,0\t2\t10,20\t0,80")
+    val record = BedRecord.fromLine(
+      "chrQ\t0\t100\tname\t3\t+\t1\t3\t255,0,0\t2\t10,20\t0,80")
     val exons = record.exons
     exons should not be None
     exons.get(0).originals().head shouldBe record
@@ -111,9 +123,12 @@ class BedRecordTest extends TestNGSuite with Matchers {
   }
 
   @Test def testIntrons(): Unit = {
-    BedRecord.fromLine("chrQ\t0\t100\tname\t3\t+\t1\t3\t255,0,0").introns shouldBe None
+    BedRecord
+      .fromLine("chrQ\t0\t100\tname\t3\t+\t1\t3\t255,0,0")
+      .introns shouldBe None
 
-    val record = BedRecord.fromLine("chrQ\t0\t100\tname\t3\t+\t1\t3\t255,0,0\t2\t10,20\t0,80")
+    val record = BedRecord.fromLine(
+      "chrQ\t0\t100\tname\t3\t+\t1\t3\t255,0,0\t2\t10,20\t0,80")
     val introns = record.introns
     introns should not be None
     introns.get(0).originals().head shouldBe record
@@ -124,7 +139,8 @@ class BedRecordTest extends TestNGSuite with Matchers {
   }
 
   @Test def testExonIntronOverlap(): Unit = {
-    val record = BedRecord.fromLine("chrQ\t0\t100\tname\t3\t+\t1\t3\t255,0,0\t2\t10,20\t0,80")
+    val record = BedRecord.fromLine(
+      "chrQ\t0\t100\tname\t3\t+\t1\t3\t255,0,0\t2\t10,20\t0,80")
     val exons = record.exons
     val introns = record.introns
     for (exon <- exons.get; intron <- introns.get) {
@@ -136,7 +152,8 @@ class BedRecordTest extends TestNGSuite with Matchers {
     BedRecord.fromLine("chrQ\t0\t100\tname\t3\t+").utr3 shouldBe None
     BedRecord.fromLine("chrQ\t0\t100\tname\t3\t+").utr5 shouldBe None
 
-    val record = BedRecord.fromLine("chrQ\t0\t100\tname\t3\t+\t3\t93\t255,0,0\t2\t10,20\t0,80")
+    val record = BedRecord.fromLine(
+      "chrQ\t0\t100\tname\t3\t+\t3\t93\t255,0,0\t2\t10,20\t0,80")
     val utr5 = record.utr5
     val utr3 = record.utr3
     utr5 should not be None
@@ -150,7 +167,8 @@ class BedRecordTest extends TestNGSuite with Matchers {
     BedRecord.fromLine("chrQ\t0\t100\tname\t3\t-").utr3 shouldBe None
     BedRecord.fromLine("chrQ\t0\t100\tname\t3\t-").utr5 shouldBe None
 
-    val record = BedRecord.fromLine("chrQ\t0\t100\tname\t3\t-\t3\t93\t255,0,0\t2\t10,20\t0,80")
+    val record = BedRecord.fromLine(
+      "chrQ\t0\t100\tname\t3\t-\t3\t93\t255,0,0\t2\t10,20\t0,80")
     val utr5 = record.utr5
     val utr3 = record.utr3
     utr5 should not be None
@@ -190,7 +208,9 @@ class BedRecordTest extends TestNGSuite with Matchers {
 
   @Test def testErrors(): Unit = {
     BedRecord("chrQ", 0, 3).validate
-    BedRecord.fromLine("chrQ\t0\t100\tname\t3\t+\t1\t3\t255,0,0\t2\t10,20\t20,50").validate
+    BedRecord
+      .fromLine("chrQ\t0\t100\tname\t3\t+\t1\t3\t255,0,0\t2\t10,20\t20,50")
+      .validate
     intercept[IllegalArgumentException] {
       BedRecord("chrQ", 0, 0).validate
     }
@@ -198,10 +218,14 @@ class BedRecordTest extends TestNGSuite with Matchers {
       BedRecord("chrQ", 4, 3).validate
     }
     intercept[IllegalArgumentException] {
-      BedRecord.fromLine("chrQ\t0\t100\tname\t3\t+\t1\t3\t255,0,0\t2\t10\t50").validate
+      BedRecord
+        .fromLine("chrQ\t0\t100\tname\t3\t+\t1\t3\t255,0,0\t2\t10\t50")
+        .validate
     }
     intercept[IllegalStateException] {
-      BedRecord.fromLine("chrQ\t0\t100\tname\t3\tx\t1\t3\t255,0,0\t2\t10,20\t20,50").validate
+      BedRecord
+        .fromLine("chrQ\t0\t100\tname\t3\tx\t1\t3\t255,0,0\t2\t10,20\t20,50")
+        .validate
     }
   }
 }
