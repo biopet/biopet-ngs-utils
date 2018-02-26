@@ -15,7 +15,7 @@ developers += Developer(id = "ffinfo",
 
 scalaVersion := "2.11.11"
 
-libraryDependencies += "com.github.biopet" %% "common-utils" % "0.3-SNAPSHOT" changing ()
+libraryDependencies += "com.github.biopet" %% "common-utils" % "0.3"
 libraryDependencies += "com.github.samtools" % "htsjdk" % "2.14.1"
 
 libraryDependencies += "com.github.biopet" %% "test-utils" % "0.3"
