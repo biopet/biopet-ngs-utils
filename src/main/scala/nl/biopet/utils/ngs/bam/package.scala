@@ -185,4 +185,11 @@ package object bam {
     }
   }
 
+  /** Returns a SAMSequenceDictionary from a bam file */
+  def getDictFromBam(file: File): SAMSequenceDictionary = {
+    val reader = SamReaderFactory.makeDefault.open(file)
+    val dict = reader.getFileHeader.getSequenceDictionary
+    reader.close()
+    dict
+  }
 }
