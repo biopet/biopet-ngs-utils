@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2014 Biopet
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of
+ * this software and associated documentation files (the "Software"), to deal in
+ * the Software without restriction, including without limitation the rights to
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+ * the Software, and to permit persons to whom the Software is furnished to do so,
+ * subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
 package nl.biopet.utils.ngs
 
 import nl.biopet.test.BiopetTest
@@ -5,14 +26,27 @@ import org.testng.annotations.Test
 
 class NgsTest extends BiopetTest {
   @Test
-  def testSeuqnce2bit(): Unit = {
+  def testSingleSequence2bit(): Unit = {
+    val seq = "ATCG"
+    val i = sequenceTo2bitSingleInt(seq)
+    val newSeq = new String(int2bitToSequence(i))
+    assert(newSeq.startsWith(seq))
+
+    intercept[IllegalStateException] {
+      sequenceTo2bitSingleInt("N")
+    }.getMessage shouldBe "Only ATCG is allowed here, 'N' is not"
+  }
+
+  @Test
+  def testSequence2bit(): Unit = {
     val seq = "ATCG"
     val i = sequenceTo2bitInt(seq)
     val newSeq = new String(int2bitToSequence(i))
     assert(newSeq.startsWith(seq))
 
     intercept[IllegalStateException] {
-      sequenceTo2bitInt("N")
+      sequenceTo2bitSingleInt("N")
     }.getMessage shouldBe "Only ATCG is allowed here, 'N' is not"
   }
+
 }
