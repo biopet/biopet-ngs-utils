@@ -33,6 +33,10 @@ class ReferenceRegionTest extends BiopetTest {
     region.sequence.length shouldBe 10
     bedRecord.length shouldBe region.sequence.length
     region.sequenceString shouldBe "GAAACTCCAA"
+
+    val region2 = ReferenceRegion(resourceFile("/fake_chrQ.fa"), "chrQ", 11, 20)
+    region2.sequence.length shouldBe 10
+    region2.sequenceString shouldBe "GAAACTCCAA"
   }
 
   @Test
