@@ -40,10 +40,6 @@ class NgsTest extends BiopetTest {
     result.foreach(i shouldBe _)
     val newSeq = new String(int2bitToSequence(i))
     assert(newSeq.startsWith(seq))
-
-    intercept[IllegalStateException] {
-      sequenceTo2bitSingleInt("N")
-    }.getMessage shouldBe "Only ATCG is allowed here, 'N' is not"
   }
 
   @Test(dataProvider = "seq")
@@ -51,9 +47,16 @@ class NgsTest extends BiopetTest {
     val i = sequenceTo2bitInt(seq)
     val newSeq = new String(int2bitToSequence(i))
     assert(newSeq.startsWith(seq))
+  }
 
+  @Test
+  def testSingleSequenceWrongChar(): Unit = {
     intercept[IllegalStateException] {
       sequenceTo2bitSingleInt("N")
+    }.getMessage shouldBe "Only ATCG is allowed here, 'N' is not"
+
+    intercept[IllegalStateException] {
+      sequenceTo2bitInt("N")
     }.getMessage shouldBe "Only ATCG is allowed here, 'N' is not"
   }
 }
