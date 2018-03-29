@@ -22,13 +22,22 @@
 package nl.biopet.utils.ngs
 
 import nl.biopet.test.BiopetTest
-import org.testng.annotations.Test
+import org.testng.annotations.{DataProvider, Test}
 
 class NgsTest extends BiopetTest {
-  @Test
-  def testSingleSequence2bit(): Unit = {
-    val seq = "ATCG"
+
+  @DataProvider(name = "seq")
+  def sequenceProvider: Array[Array[Any]] = {
+    Array(
+      Array("ATCG", Some((0 << 0) + (1 << 2) + (2 << 4) + (3 << 6))),
+      Array("ATCGATCGATCGATCG", None)
+    )
+  }
+
+  @Test(dataProvider = "seq")
+  def testSingleSequence2bit(seq: String, result: Option[Int]): Unit = {
     val i = sequenceTo2bitSingleInt(seq)
+    result.foreach(i shouldBe _)
     val newSeq = new String(int2bitToSequence(i))
     assert(newSeq.startsWith(seq))
 
@@ -37,9 +46,8 @@ class NgsTest extends BiopetTest {
     }.getMessage shouldBe "Only ATCG is allowed here, 'N' is not"
   }
 
-  @Test
-  def testSequence2bit(): Unit = {
-    val seq = "ATCG"
+  @Test(dataProvider = "seq")
+  def testSequence2bit(seq: String, result: Option[Int]): Unit = {
     val i = sequenceTo2bitInt(seq)
     val newSeq = new String(int2bitToSequence(i))
     assert(newSeq.startsWith(seq))
@@ -48,5 +56,4 @@ class NgsTest extends BiopetTest {
       sequenceTo2bitSingleInt("N")
     }.getMessage shouldBe "Only ATCG is allowed here, 'N' is not"
   }
-
 }

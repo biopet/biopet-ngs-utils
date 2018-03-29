@@ -102,7 +102,7 @@ package object ngs {
     */
   def int2bitToSequence(sequence: Int): Array[Byte] = {
     (0 to 16).map { i =>
-      (sequence >> (i * 2)) % 4 match {
+      (sequence >> (i * 2)) & 3 match {
         case 0 => A
         case 1 => T
         case 2 => C
