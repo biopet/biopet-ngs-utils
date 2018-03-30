@@ -13,38 +13,42 @@ object IndexScattering {
     val samReader = SamReaderFactory.makeDefault().open(bamFile)
     val dict = samReader.getFileHeader.getSequenceDictionary
     samReader.close()
-    creatBamBins(BedRecordList.fromDict(dict).allRecords.toList, bamFile, chunks)
+    creatBamBins(BedRecordList.fromDict(dict).allRecords.toList,
+                 bamFile,
+                 chunks)
   }
 
-  def creatBamBins(regions: List[BedRecord], bamFile: File, chunks: Int): List[List[BedRecord]] = {
+  def creatBamBins(regions: List[BedRecord],
+                   bamFile: File,
+                   chunks: Int): List[List[BedRecord]] = {
     val samReader = SamReaderFactory.makeDefault().open(bamFile)
     val dict = samReader.getFileHeader.getSequenceDictionary
     val index = samReader.indexing().getIndex
     val chunksEachRegion = for (region <- regions) yield {
       region -> index.getSpanOverlapping(dict.getSequenceIndex(region.chr),
-        region.start,
-        region.end)
+                                         region.start,
+                                         region.end)
     }
-    val sizeEachRegion = chunksEachRegion.map(s =>
-      List(s._1) -> s._2.getChunks
-        .map(c => c.getChunkEnd - c.getChunkStart)
-        .sum)
+    val sizeEachRegion = chunksEachRegion.map(
+      s =>
+        List(s._1) -> s._2.getChunks
+          .map(c => c.getChunkEnd - c.getChunkStart)
+          .sum)
     val totalSize = sizeEachRegion.map(_._2).sum
     val sizePerBin = totalSize / chunks
-    createBamBins(sizeEachRegion.filter(_._2 > 0),
-      sizePerBin,
-      dict,
-      index).map(_._1)
+    createBamBins(sizeEachRegion.filter(_._2 > 0), sizePerBin, dict, index)
+      .map(_._1)
 
   }
 
   @tailrec
   private def createBamBins(
-                             regions: List[(List[BedRecord], Long)],
-                             sizePerBin: Long,
-                             dict: SAMSequenceDictionary,
-                             index: BAMIndex,
-                             minSize: Int = 200, iterations: Int = 1): List[(List[BedRecord], Long)] = {
+      regions: List[(List[BedRecord], Long)],
+      sizePerBin: Long,
+      dict: SAMSequenceDictionary,
+      index: BAMIndex,
+      minSize: Int = 200,
+      iterations: Int = 1): List[(List[BedRecord], Long)] = {
     val largeContigs = regions.filter(_._2 * 1.5 > sizePerBin)
     val rebin = largeContigs.filter(_._1.map(_.length).sum > minSize)
     val mediumContigs = regions.filter(c =>
@@ -65,7 +69,7 @@ object IndexScattering {
     val result = regions
       .sortBy(_._2)
       .foldLeft((List[(List[BedRecord], Long)](),
-        Option.empty[(List[BedRecord], Long)])) {
+                 Option.empty[(List[BedRecord], Long)])) {
         case ((r, current), newRecord) =>
           current match {
             case Some(c) =>
@@ -102,8 +106,8 @@ object IndexScattering {
               y =>
                 index
                   .getSpanOverlapping(dict.getSequenceIndex(y.chr),
-                    y.start,
-                    y.end)
+                                      y.start,
+                                      y.end)
                   .getChunks
                   .map(z => z.getChunkEnd - z.getChunkStart)
                   .sum)
