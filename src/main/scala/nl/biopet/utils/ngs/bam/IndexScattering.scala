@@ -29,15 +29,19 @@ object IndexScattering {
                                          region.start,
                                          region.end)
     }
-    val sizeEachRegion = chunksEachRegion.map(
-      s =>
-        List(s._1) -> s._2.getChunks
+    val sizeEachRegion = chunksEachRegion.map {
+      case (region, span) =>
+        List(region) -> span.getChunks
           .map(c => c.getChunkEnd - c.getChunkStart)
-          .sum)
-    val totalSize = sizeEachRegion.map(_._2).sum
+          .sum
+    }
+    val totalSize = sizeEachRegion.map { case (_, length) => length }.sum
     val sizePerBin = totalSize / chunks
-    createBamBins(sizeEachRegion.filter(_._2 > 0), sizePerBin, dict, index)
-      .map(_._1)
+    createBamBins(sizeEachRegion.filter { case (_, length) => length > 0 },
+                  sizePerBin,
+                  dict,
+                  index)
+      .map { case (r, _) => r }
 
   }
 
@@ -49,12 +53,16 @@ object IndexScattering {
       index: BAMIndex,
       minSize: Int = 200,
       iterations: Int = 1): List[(List[BedRecord], Long)] = {
-    val largeContigs = regions.filter(_._2 * 1.5 > sizePerBin)
-    val rebin = largeContigs.filter(_._1.map(_.length).sum > minSize)
-    val mediumContigs = regions.filter(c =>
-      c._2 * 1.5 <= sizePerBin && c._2 * 0.5 >= sizePerBin) ::: largeContigs
-      .filter(_._1.map(_.length).sum <= minSize)
-    val smallContigs = regions.filter(_._2 * 0.5 < sizePerBin)
+    val largeContigs = regions.filter { case (_, l) => l * 1.5 > sizePerBin }
+    val rebin = largeContigs.filter {
+      case (cr, _) => cr.map(_.length).sum > minSize
+    }
+    val mediumContigs = regions.filter {
+      case (_, l) =>
+        l * 1.5 <= sizePerBin && l * 0.5 >= sizePerBin
+    } ::: largeContigs
+      .filter { case (cr, _)                        => cr.map(_.length).sum <= minSize }
+    val smallContigs = regions.filter { case (_, l) => l * 0.5 < sizePerBin }
 
     if (rebin.nonEmpty && iterations > 0) {
       val total = splitBins(rebin, sizePerBin, dict, index) ::: mediumContigs ::: combineBins(
@@ -66,22 +74,22 @@ object IndexScattering {
 
   private def combineBins(regions: List[(List[BedRecord], Long)],
                           sizePerBin: Long): List[(List[BedRecord], Long)] = {
-    val result = regions
-      .sortBy(_._2)
+    val (result, leftover) = regions
+      .sortBy { case (_, l) => l }
       .foldLeft((List[(List[BedRecord], Long)](),
                  Option.empty[(List[BedRecord], Long)])) {
-        case ((r, current), newRecord) =>
+        case ((r, current), (newRegions, newLength)) =>
           current match {
-            case Some(c) =>
-              if ((c._2 + newRecord._2) > (sizePerBin * 1.5)) {
-                (c :: r, Some(newRecord))
+            case Some((cr, cl)) =>
+              if ((cl + newLength) > (sizePerBin * 1.5)) {
+                ((cr, cl) :: r, Some((newRegions, newLength)))
               } else {
-                (r, Some((c._1 ::: newRecord._1, c._2 + newRecord._2)))
+                (r, Some((cr ::: newRegions, cl + newLength)))
               }
-            case _ => (r, Some(newRecord))
+            case _ => (r, Some((newRegions, newLength)))
           }
       }
-    result._1 ::: result._2.toList
+    result ::: leftover.toList
   }
 
   private def splitBins(regions: List[(List[BedRecord], Long)],
@@ -98,7 +106,11 @@ object IndexScattering {
         val refSize = list.length
         val chunkSize = {
           val x = refSize / chunks
-          if (x > refSize) refSize else if (x > 0) x else 1
+          x match {
+            case _ if x > refSize => refSize
+            case _ if x > 0       => x
+            case _                => 1
+          }
         }
         list.scatter(chunkSize.toInt).map { x =>
           val newSize = x
