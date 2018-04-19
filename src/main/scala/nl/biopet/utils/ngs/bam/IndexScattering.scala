@@ -9,18 +9,18 @@ import scala.annotation.tailrec
 import scala.collection.JavaConversions._
 
 object IndexScattering {
-  def creatBamBins(bamFile: File, chunks: Int): List[List[BedRecord]] = {
+  def createBamBins(bamFile: File, chunks: Int): List[List[BedRecord]] = {
     val samReader = SamReaderFactory.makeDefault().open(bamFile)
     val dict = samReader.getFileHeader.getSequenceDictionary
     samReader.close()
-    creatBamBins(BedRecordList.fromDict(dict).allRecords.toList,
+    createBamBins(BedRecordList.fromDict(dict).allRecords.toList,
                  bamFile,
                  chunks)
   }
 
-  def creatBamBins(regions: List[BedRecord],
-                   bamFile: File,
-                   chunks: Int): List[List[BedRecord]] = {
+  def createBamBins(regions: List[BedRecord],
+                    bamFile: File,
+                    chunks: Int): List[List[BedRecord]] = {
     val samReader = SamReaderFactory.makeDefault().open(bamFile)
     val dict = samReader.getFileHeader.getSequenceDictionary
     val index = samReader.indexing().getIndex
