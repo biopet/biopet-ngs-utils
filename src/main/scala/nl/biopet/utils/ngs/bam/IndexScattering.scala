@@ -14,8 +14,8 @@ object IndexScattering {
     val dict = samReader.getFileHeader.getSequenceDictionary
     samReader.close()
     createBamBins(BedRecordList.fromDict(dict).allRecords.toList,
-                 bamFile,
-                 chunks)
+                  bamFile,
+                  chunks)
   }
 
   def createBamBins(regions: List[BedRecord],
