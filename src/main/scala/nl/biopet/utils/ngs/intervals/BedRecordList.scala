@@ -125,11 +125,23 @@ case class BedRecordList(chrRecords: Map[String, List[BedRecord]],
   def scatter(
       binSize: Int,
       combineContigs: Boolean = true,
-      maxContigsInSingleJob: Option[Int] = None): List[List[BedRecord]] = {
+      maxContigsInSingleJob: Option[Int] = None,
+      contigSortOrder: Option[List[String]] = None): List[List[BedRecord]] = {
     val list = allRecords
       .flatMap(_.scatter(binSize))
       .toList
-      .sortBy(_.length)
+      .sortWith(contigSortOrder match {
+        case Some(order) => // Sort by chromosome, start position if contigSortOrder is given
+          (l, r) =>
+            {
+              order.indexOf(l.chr) < order.indexOf(r.chr) ||
+              (order.indexOf(l.chr) == order.indexOf(r.chr) &&
+              l.start < r.start)
+            }
+        case _ => // Otherwise sort by length
+          (l, r) =>
+            { l.length < r.length }
+      })
       .reverse
       .foldLeft((List[List[BedRecord]](), List[BedRecord]())) {
         case ((finalList, buffer), record) =>

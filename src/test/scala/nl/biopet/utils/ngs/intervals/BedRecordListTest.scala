@@ -177,6 +177,26 @@ class BedRecordListTest extends TestNGSuite with Matchers {
     scatterList.size shouldBe 16
     scatterList.flatten.map(_.length).sum shouldBe 1530
   }
+
+  @Test def testScatterContigOrder(): Unit = {
+    val list = BedRecordList.fromList(
+      List(BedRecord("chrA", 0, 200),
+           BedRecord("chrB", 0, 95),
+           BedRecord("chrC", 0, 100),
+           BedRecord("chrD", 0, 45),
+           BedRecord("chrE", 0, 45)))
+    val contigOrder: List[String] = List("chrA", "chrB", "chrC", "chrD", "chrE")
+    val scatter = list.scatter(100, contigSortOrder = Option(contigOrder))
+    scatter.length shouldBe 5
+    val flat = scatter.flatten
+    flat.size shouldBe 6
+    flat.head.chr shouldBe "chrA"
+    flat(1).chr shouldBe "chrA"
+    flat(2).chr shouldBe "chrB"
+    flat(3).chr shouldBe "chrC"
+    flat(4).chr shouldBe "chrD"
+    flat(5).chr shouldBe "chrE"
+  }
 }
 
 object BedRecordListTest {
