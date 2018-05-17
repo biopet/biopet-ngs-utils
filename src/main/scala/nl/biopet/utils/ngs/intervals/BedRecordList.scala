@@ -133,14 +133,12 @@ case class BedRecordList(chrRecords: Map[String, List[BedRecord]],
       .sortWith(sequenceDict match {
         case Some(order) => // Sort by chromosome, start position if contigSortOrder is given
           (l, r) =>
-            {
-              order.getSequenceIndex(l.chr) < order.getSequenceIndex(r.chr) ||
-              (order.getSequenceIndex(l.chr) == order.getSequenceIndex(r.chr) &&
-              l.start < r.start)
-            }
+            order.getSequenceIndex(l.chr) < order.getSequenceIndex(r.chr) ||
+            (order.getSequenceIndex(l.chr) == order.getSequenceIndex(r.chr) &&
+            l.start < r.start)
         case _ => // Otherwise sort by length
           (l, r) =>
-            { l.length < r.length }
+            l.length < r.length
       })
       .reverse
       .foldLeft((List[List[BedRecord]](), List[BedRecord]())) {
