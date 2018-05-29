@@ -43,6 +43,10 @@ class SampleCompare(header: VCFHeader) extends Serializable {
     Array.fill(samples.size)(Array.fill(samples.size)(0L))
   protected[SampleCompare] val genotypesCounts: Array[Array[Long]] =
     Array.fill(samples.size)(Array.fill(samples.size)(0L))
+  protected[SampleCompare] val refGenotypesCounts: Array[Array[Long]] =
+    Array.fill(samples.size)(Array.fill(samples.size)(0L))
+  protected[SampleCompare] val refAllelesCounts: Array[Array[Long]] =
+    Array.fill(samples.size)(Array.fill(samples.size)(0L))
 
   /** Return the number of overlapping alleles */
   def allelesCount(name1: String)(name2: String): Long =
@@ -64,6 +68,8 @@ class SampleCompare(header: VCFHeader) extends Serializable {
     for ((_, s1) <- samples; (_, s2) <- samples) {
       this.genotypesCounts(s1)(s2) += other.genotypesCounts(s1)(s2)
       this.allelesCounts(s1)(s2) += other.allelesCounts(s1)(s2)
+      this.refGenotypesCounts(s1)(s2) += other.refGenotypesCounts(s1)(s2)
+      this.refAllelesCounts(s1)(s2) += other.refAllelesCounts(s1)(s2)
     }
     this
   }
@@ -81,21 +87,29 @@ class SampleCompare(header: VCFHeader) extends Serializable {
       }
       .getOrElse(samples)
 
-    val alleles = compareSamples.map(
-      s =>
-        s._2 -> record
-          .getGenotype(s._2)
+    val refIndex = record.getAlleleIndex(record.getReference)
+    val alleles = compareSamples.map{ case (_, i) =>
+        i -> record
+          .getGenotype(i)
           .getAlleles
           .map(record.getAlleleIndex)
-          .toList)
+          .toList}
+
+    val refCounts = compareSamples.map{ case (_, i) =>
+      i -> alleles(i).count(_ == refIndex)
+    }
 
     for ((_, sample1) <- compareSamples; (_, sample2) <- compareSamples) {
+      val overlapRef = List(refCounts(sample1), refCounts(sample2)).min
       if (alleles(sample1) == alleles(sample2)) {
         genotypesCounts(sample1)(sample2) += 1
+        if (alleles(sample1).forall(_ == refIndex)) refGenotypesCounts(sample1)(sample2) += 1
         allelesCounts(sample1)(sample2) += alleles(sample1).size()
+        refAllelesCounts(sample1)(sample2) += alleles(sample1).size() - overlapRef
       } else {
-        allelesCounts(sample1)(sample2) += alleleIndexOverlap(alleles(sample1),
-                                                              alleles(sample2))
+        val c = alleleIndexOverlap(alleles(sample1), alleles(sample2))
+        allelesCounts(sample1)(sample2) += c
+        refAllelesCounts(sample1)(sample2) += c - overlapRef
       }
     }
   }
@@ -143,6 +157,22 @@ class SampleCompare(header: VCFHeader) extends Serializable {
     writeOverlapFile(genotypesCounts, outputFile, relative)
 
   /**
+    * Writes reference genotype matrix to a file
+    * @param outputFile File to write to
+    * @param relative If true values will be devided by the total number of counts for a sample
+    */
+  def writeRefGenotypeOverlap(outputFile: File, relative: Boolean = false): Unit =
+    writeOverlapFile(refGenotypesCounts, outputFile, relative)
+
+  /**
+    * Writes reference genotype matrix to a file
+    * @param outputFile File to write to
+    * @param relative If true values will be devided by the total number of counts for a sample
+    */
+  def writeRefAllelesOverlap(outputFile: File, relative: Boolean = false): Unit =
+    writeOverlapFile(refAllelesCounts, outputFile, relative)
+
+  /**
     * Write all posible files to directory
     * @param outputDir Directory to write to
     */
@@ -155,6 +185,8 @@ class SampleCompare(header: VCFHeader) extends Serializable {
     writeGenotypeOverlap(new File(outputDir, "genotype.abs.tsv"))
     writeGenotypeOverlap(new File(outputDir, "genotype.rel.tsv"),
                          relative = true)
+    writeRefGenotypeOverlap(new File(outputDir, "genotype.ref.abs.tsv"))
+    writeRefAllelesOverlap(new File(outputDir, "alleles.ref.abs.tsv"))
   }
 
 }
