@@ -88,28 +88,32 @@ class SampleCompare(header: VCFHeader) extends Serializable {
       .getOrElse(samples)
 
     val refIndex = record.getAlleleIndex(record.getReference)
-    val alleles = compareSamples.map{ case (_, i) =>
+    val alleles = compareSamples.map {
+      case (_, i) =>
         i -> record
           .getGenotype(i)
           .getAlleles
           .map(record.getAlleleIndex)
-          .toList}
+          .toList
+    }
 
-    val refCounts = compareSamples.map{ case (_, i) =>
-      i -> alleles(i).count(_ == refIndex)
+    val refCounts = compareSamples.map {
+      case (_, i) =>
+        i -> alleles(i).count(_ == refIndex)
     }
 
     for ((_, sample1) <- compareSamples; (_, sample2) <- compareSamples) {
       val overlapRef = List(refCounts(sample1), refCounts(sample2)).min
       if (alleles(sample1) == alleles(sample2)) {
         genotypesCounts(sample1)(sample2) += 1
-        if (alleles(sample1).forall(_ == refIndex)) refGenotypesCounts(sample1)(sample2) += 1
+        if (alleles(sample1).forall(_ == refIndex))
+          refGenotypesCounts(sample1)(sample2) += 1
         allelesCounts(sample1)(sample2) += alleles(sample1).size()
-        refAllelesCounts(sample1)(sample2) += alleles(sample1).size() - overlapRef
+        refAllelesCounts(sample1)(sample2) += overlapRef
       } else {
         val c = alleleIndexOverlap(alleles(sample1), alleles(sample2))
         allelesCounts(sample1)(sample2) += c
-        refAllelesCounts(sample1)(sample2) += c - overlapRef
+        refAllelesCounts(sample1)(sample2) += overlapRef
       }
     }
   }
@@ -161,7 +165,8 @@ class SampleCompare(header: VCFHeader) extends Serializable {
     * @param outputFile File to write to
     * @param relative If true values will be devided by the total number of counts for a sample
     */
-  def writeRefGenotypeOverlap(outputFile: File, relative: Boolean = false): Unit =
+  def writeRefGenotypeOverlap(outputFile: File,
+                              relative: Boolean = false): Unit =
     writeOverlapFile(refGenotypesCounts, outputFile, relative)
 
   /**
@@ -169,7 +174,8 @@ class SampleCompare(header: VCFHeader) extends Serializable {
     * @param outputFile File to write to
     * @param relative If true values will be devided by the total number of counts for a sample
     */
-  def writeRefAllelesOverlap(outputFile: File, relative: Boolean = false): Unit =
+  def writeRefAllelesOverlap(outputFile: File,
+                             relative: Boolean = false): Unit =
     writeOverlapFile(refAllelesCounts, outputFile, relative)
 
   /**
@@ -186,7 +192,7 @@ class SampleCompare(header: VCFHeader) extends Serializable {
     writeGenotypeOverlap(new File(outputDir, "genotype.rel.tsv"),
                          relative = true)
     writeRefGenotypeOverlap(new File(outputDir, "genotype.ref.abs.tsv"))
-    writeRefAllelesOverlap(new File(outputDir, "alleles.ref.abs.tsv"))
+    writeRefAllelesOverlap(new File(outputDir, "allele.ref.abs.tsv"))
   }
 
 }
