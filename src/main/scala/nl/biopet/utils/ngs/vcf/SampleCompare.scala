@@ -179,6 +179,41 @@ class SampleCompare(header: VCFHeader) extends Serializable {
     writeOverlapFile(refAllelesCounts, outputFile, relative)
 
   /**
+    * Writes non reference genotype matrix to a file
+    * @param outputFile File to write to
+    * @param relative If true values will be devided by the total number of counts for a sample
+    */
+  def writeNonRefGenotypeOverlap(outputFile: File,
+                                 relative: Boolean = false): Unit = {
+    writeOverlapFile(substractMatrix(genotypesCounts, refGenotypesCounts),
+                     outputFile,
+                     relative)
+  }
+
+  /**
+    * Writes non reference allele matrix to a file
+    * @param outputFile File to write to
+    * @param relative If true values will be devided by the total number of counts for a sample
+    */
+  def writeNonRefAllelesOverlap(outputFile: File,
+                                relative: Boolean = false): Unit = {
+    writeOverlapFile(substractMatrix(allelesCounts, refAllelesCounts),
+                     outputFile,
+                     relative)
+  }
+
+  def substractMatrix(start: Array[Array[Long]],
+                      substract: Array[Array[Long]]): Array[Array[Long]] = {
+    start.zipWithIndex.map {
+      case (row, idx1) =>
+        row.zipWithIndex.map {
+          case (cell, idx2) =>
+            cell - substract(idx1)(idx2)
+        }
+    }
+  }
+
+  /**
     * Write all posible files to directory
     * @param outputDir Directory to write to
     */
@@ -193,6 +228,7 @@ class SampleCompare(header: VCFHeader) extends Serializable {
                          relative = true)
     writeRefGenotypeOverlap(new File(outputDir, "genotype.ref.abs.tsv"))
     writeRefAllelesOverlap(new File(outputDir, "allele.ref.abs.tsv"))
+    writeNonRefGenotypeOverlap(new File(outputDir, "genotype.non_ref.abs.tsv"))
+    writeNonRefAllelesOverlap(new File(outputDir, "allele.non_ref.abs.tsv"))
   }
-
 }

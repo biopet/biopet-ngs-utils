@@ -55,6 +55,8 @@ class SampleCompareTest extends BiopetTest {
     new File(tempDir, "genotype.rel.tsv") should exist
     new File(tempDir, "genotype.ref.abs.tsv") should exist
     new File(tempDir, "allele.ref.abs.tsv") should exist
+    new File(tempDir, "genotype.non_ref.abs.tsv") should exist
+    new File(tempDir, "allele.non_ref.abs.tsv") should exist
 
     Source
       .fromFile(new File(tempDir, "allele.abs.tsv"))
@@ -114,6 +116,26 @@ class SampleCompareTest extends BiopetTest {
       "Sample_2\t5\t6\t6",
       "Sample_3\t5\t6\t7"
     )
+
+    Source
+      .fromFile(new File(tempDir, "genotype.non_ref.abs.tsv"))
+      .getLines()
+      .toList shouldBe List(
+      "Sample\tSample_1\tSample_2\tSample_3",
+      "Sample_1\t3\t2\t1",
+      "Sample_2\t2\t2\t1",
+      "Sample_3\t1\t1\t1"
+    )
+
+    Source
+      .fromFile(new File(tempDir, "allele.non_ref.abs.tsv"))
+      .getLines()
+      .toList shouldBe List(
+      "Sample\tSample_1\tSample_2\tSample_3",
+      "Sample_1\t3\t2\t1",
+      "Sample_2\t2\t2\t1",
+      "Sample_3\t1\t1\t1"
+    )
   }
 
   @Test
@@ -141,6 +163,8 @@ class SampleCompareTest extends BiopetTest {
     new File(tempDir, "genotype.rel.tsv") should exist
     new File(tempDir, "genotype.ref.abs.tsv") should exist
     new File(tempDir, "allele.ref.abs.tsv") should exist
+    new File(tempDir, "genotype.non_ref.abs.tsv") should exist
+    new File(tempDir, "allele.non_ref.abs.tsv") should exist
 
     Source
       .fromFile(new File(tempDir, "allele.abs.tsv"))
@@ -200,6 +224,26 @@ class SampleCompareTest extends BiopetTest {
       "Sample_2\t10\t12\t12",
       "Sample_3\t10\t12\t14"
     )
+
+    Source
+      .fromFile(new File(tempDir, "genotype.non_ref.abs.tsv"))
+      .getLines()
+      .toList shouldBe List(
+      "Sample\tSample_1\tSample_2\tSample_3",
+      "Sample_1\t6\t4\t2",
+      "Sample_2\t4\t4\t2",
+      "Sample_3\t2\t2\t2"
+    )
+
+    Source
+      .fromFile(new File(tempDir, "allele.non_ref.abs.tsv"))
+      .getLines()
+      .toList shouldBe List(
+      "Sample\tSample_1\tSample_2\tSample_3",
+      "Sample_1\t6\t4\t2",
+      "Sample_2\t4\t4\t2",
+      "Sample_3\t2\t2\t2"
+    )
   }
 
   @Test
@@ -218,6 +262,8 @@ class SampleCompareTest extends BiopetTest {
     new File(tempDir, "genotype.rel.tsv") should exist
     new File(tempDir, "genotype.ref.abs.tsv") should exist
     new File(tempDir, "allele.ref.abs.tsv") should exist
+    new File(tempDir, "genotype.non_ref.abs.tsv") should exist
+    new File(tempDir, "allele.non_ref.abs.tsv") should exist
 
     Source
       .fromFile(new File(tempDir, "allele.abs.tsv"))
@@ -277,6 +323,26 @@ class SampleCompareTest extends BiopetTest {
       "Sample_1\t2\t1\t2",
       "Sample_2\t1\t3\t3",
       "Sample_3\t2\t3\t5"
+    )
+
+    Source
+      .fromFile(new File(tempDir, "genotype.non_ref.abs.tsv"))
+      .getLines()
+      .toList shouldBe List(
+      "Sample\tSample_1\tSample_2\tSample_3",
+      "Sample_1\t2\t0\t1",
+      "Sample_2\t0\t1\t0",
+      "Sample_3\t1\t0\t1"
+    )
+
+    Source
+      .fromFile(new File(tempDir, "allele.non_ref.abs.tsv"))
+      .getLines()
+      .toList shouldBe List(
+      "Sample\tSample_1\tSample_2\tSample_3",
+      "Sample_1\t2\t0\t1",
+      "Sample_2\t0\t1\t0",
+      "Sample_3\t1\t0\t1"
     )
   }
 }
