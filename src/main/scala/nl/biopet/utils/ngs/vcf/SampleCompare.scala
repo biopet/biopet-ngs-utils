@@ -202,6 +202,7 @@ class SampleCompare(header: VCFHeader) extends Serializable {
                      relative)
   }
 
+  /** Subtract matrix from an other */
   def substractMatrix(start: Array[Array[Long]],
                       substract: Array[Array[Long]]): Array[Array[Long]] = {
     start.zipWithIndex.map {
