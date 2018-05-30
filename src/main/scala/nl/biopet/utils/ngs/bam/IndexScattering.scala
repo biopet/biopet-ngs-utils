@@ -74,23 +74,32 @@ object IndexScattering {
       index: BAMIndex,
       minSize: Int = 200,
       iterations: Int = 1): List[(List[BedRecord], Long)] = {
-    val largeContigs = regions.filter { case (_, l) => l * 1.5 > sizePerBin }
-    val rebin = largeContigs.filter {
-      case (cr, _) => cr.map(_.length).sum > minSize
+    val (rebin, large, medium, small) = regions.foldLeft(
+      (List[(List[BedRecord], Long)](),
+       List[(List[BedRecord], Long)](),
+       List[(List[BedRecord], Long)](),
+       List[(List[BedRecord], Long)]())) {
+      case ((r, l, m, s), (newList, newLength)) =>
+        val large = newLength * 1.5 > sizePerBin
+        val lessMinBp = newList.map(_.length).sum > minSize
+        val smallMinSize = newLength * 0.5 < sizePerBin
+
+        (large, lessMinBp, smallMinSize) match {
+          case (true, true, _)  => ((newList, newLength) :: r, l, m, s)
+          case (true, false, _) => (r, (newList, newLength) :: l, m, s)
+          case (_, _, true)     => (r, l, m, (newList, newLength) :: s)
+          case _                => (r, l, (newList, newLength) :: m, s)
+        }
     }
-    val mediumContigs = regions.filter {
-      case (_, l) =>
-        l * 1.5 <= sizePerBin && l * 0.5 >= sizePerBin
-    } ::: largeContigs
-      .filter { case (cr, _)                        => cr.map(_.length).sum <= minSize }
-    val smallContigs = regions.filter { case (_, l) => l * 0.5 < sizePerBin }
 
     if (rebin.nonEmpty && iterations > 0) {
-      val total = splitBins(rebin, sizePerBin, dict, index) ::: mediumContigs ::: combineBins(
-        smallContigs,
-        sizePerBin)
+      val total = splitBins(rebin, sizePerBin, dict, index) ::: medium ::: combineBins(
+        small,
+        sizePerBin) ::: large
       createBamBins(total, sizePerBin, dict, index, minSize, iterations - 1)
-    } else mediumContigs ::: combineBins(smallContigs, sizePerBin)
+    } else {
+      medium ::: combineBins(small, sizePerBin) ::: large ::: rebin
+    }
   }
 
   private def combineBins(regions: List[(List[BedRecord], Long)],
