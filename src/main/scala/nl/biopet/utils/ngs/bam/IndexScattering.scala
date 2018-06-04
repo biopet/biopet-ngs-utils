@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2014 Biopet
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of
+ * this software and associated documentation files (the "Software"), to deal in
+ * the Software without restriction, including without limitation the rights to
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+ * the Software, and to permit persons to whom the Software is furnished to do so,
+ * subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
 package nl.biopet.utils.ngs.bam
 
 import java.io.File
@@ -67,28 +88,32 @@ object IndexScattering {
       index: BAMIndex,
       minSize: Int = 200,
       iterations: Int = 1): List[(List[BedRecord], Long)] = {
-    val largeContigs = regions.filter { case (_, l) => l * 1.5 > sizePerBin }
-    val rebin = largeContigs.filter {
-      case (cr, _) => cr.map(_.length).sum > minSize
+    val (rebin, large, medium, small) = regions.foldLeft(
+      (List[(List[BedRecord], Long)](),
+       List[(List[BedRecord], Long)](),
+       List[(List[BedRecord], Long)](),
+       List[(List[BedRecord], Long)]())) {
+      case ((r, l, m, s), (newList, newLength)) =>
+        val large = newLength * 1.5 > sizePerBin
+        val lessMinBp = newList.map(_.length).sum > minSize
+        val smallMinSize = newLength * 0.5 < sizePerBin
+
+        (large, lessMinBp, smallMinSize) match {
+          case (true, true, _)  => ((newList, newLength) :: r, l, m, s)
+          case (true, false, _) => (r, (newList, newLength) :: l, m, s)
+          case (_, _, true)     => (r, l, m, (newList, newLength) :: s)
+          case _                => (r, l, (newList, newLength) :: m, s)
+        }
     }
-    val mediumContigs = regions.filter {
-      case (_, l) =>
-        l * 1.5 <= sizePerBin && l * 0.5 >= sizePerBin
-    } ::: largeContigs
-      .filter { case (cr, _)                        => cr.map(_.length).sum <= minSize }
-    val smallContigs = regions.filter { case (_, l) => l * 0.5 < sizePerBin }
 
     if (rebin.nonEmpty && iterations > 0) {
-      val total = splitBins(rebin, sizePerBin, dict, index) ::: mediumContigs ::: combineBins(
-        smallContigs,
-        sizePerBin)
-      createBamBinsRecurive(total,
-                            sizePerBin,
-                            dict,
-                            index,
-                            minSize,
-                            iterations - 1)
-    } else mediumContigs ::: combineBins(smallContigs, sizePerBin)
+      val total = splitBins(rebin, sizePerBin, dict, index) ::: medium ::: combineBins(
+        small,
+        sizePerBin) ::: large
+      createBamBinsRecurive(total, sizePerBin, dict, index, minSize, iterations - 1)
+    } else {
+      medium ::: combineBins(small, sizePerBin) ::: large ::: rebin
+    }
   }
 
   private def combineBins(regions: List[(List[BedRecord], Long)],

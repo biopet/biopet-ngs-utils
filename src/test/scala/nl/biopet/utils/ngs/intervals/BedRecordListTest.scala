@@ -27,6 +27,7 @@ import htsjdk.samtools.util.Interval
 import org.scalatest.Matchers
 import org.scalatest.testng.TestNGSuite
 import org.testng.annotations.{BeforeClass, Test}
+import htsjdk.samtools.{SAMSequenceDictionary, SAMSequenceRecord}
 
 /**
   * Created by pjvan_thof on 8/25/15.
@@ -176,6 +177,32 @@ class BedRecordListTest extends TestNGSuite with Matchers {
     scatterList.flatten.size shouldBe 18
     scatterList.size shouldBe 16
     scatterList.flatten.map(_.length).sum shouldBe 1530
+  }
+
+  @Test def testScatterContigOrder(): Unit = {
+    val list = BedRecordList.fromList(
+      List(BedRecord("chrA", 0, 200),
+           BedRecord("chrB", 0, 95),
+           BedRecord("chrC", 0, 100),
+           BedRecord("chrD", 0, 45),
+           BedRecord("chrE", 0, 45)))
+    val dict = new SAMSequenceDictionary()
+    dict.addSequence(new SAMSequenceRecord("chrA", 200))
+    dict.addSequence(new SAMSequenceRecord("chrB", 95))
+    dict.addSequence(new SAMSequenceRecord("chrC", 100))
+    dict.addSequence(new SAMSequenceRecord("chrD", 45))
+    dict.addSequence(new SAMSequenceRecord("chrE", 45))
+
+    val scatter = list.scatter(100, sequenceDict = Option(dict))
+    scatter.length shouldBe 5
+    val flat = scatter.flatten
+    flat.size shouldBe 6
+    flat.headOption.map(_.chr) shouldBe Some("chrA")
+    flat.lift(1).map(_.chr) shouldBe Some("chrA")
+    flat.lift(2).map(_.chr) shouldBe Some("chrB")
+    flat.lift(3).map(_.chr) shouldBe Some("chrC")
+    flat.lift(4).map(_.chr) shouldBe Some("chrD")
+    flat.lift(5).map(_.chr) shouldBe Some("chrE")
   }
 }
 
