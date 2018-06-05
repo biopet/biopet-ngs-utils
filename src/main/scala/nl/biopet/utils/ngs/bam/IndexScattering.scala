@@ -110,7 +110,12 @@ object IndexScattering {
       val total = splitBins(rebin, sizePerBin, dict, index) ::: medium ::: combineBins(
         small,
         sizePerBin) ::: large
-      createBamBinsRecurive(total, sizePerBin, dict, index, minSize, iterations - 1)
+      createBamBinsRecurive(total,
+                            sizePerBin,
+                            dict,
+                            index,
+                            minSize,
+                            iterations - 1)
     } else {
       medium ::: combineBins(small, sizePerBin) ::: large ::: rebin
     }
