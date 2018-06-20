@@ -80,8 +80,10 @@ object IndexScattering {
         }, sizePerBin, dict, index)
       } else {
         sizeEachRegion
-          .groupBy(_._1.head.chr)
-          .map(x => createBamBinsRecurive(x._2, sizePerBin, dict, index))
+          .groupBy { case (r, _) => r.headOption.map(_.chr) }
+          .map {
+            case (_, x) => createBamBinsRecurive(x, sizePerBin, dict, index)
+          }
           .reduce(_ ::: _)
       }
     } else Nil
