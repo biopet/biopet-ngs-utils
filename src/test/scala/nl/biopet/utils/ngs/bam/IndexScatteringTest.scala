@@ -28,7 +28,7 @@ class IndexScatteringTest extends BiopetTest {
   @Test
   def test(): Unit = {
     val regions =
-      IndexScattering.createBamBins(resourceFile("/paired01.bam"), 2)
+      IndexScattering.createBamBinsReference(resourceFile("/paired01.bam"), 2)
     regions.size shouldBe 2
   }
 }
