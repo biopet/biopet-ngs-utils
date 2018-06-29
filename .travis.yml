@@ -3,7 +3,7 @@ scala:
   - 2.12.5
   - 2.11.12
 script:
-  - "set -o pipefail && sbt ++$TRAVIS_SCALA_VERSION clean evicted scalafmt coverage test coverageReport coverageAggregate | tee sbt.log"
+  - "set -o pipefail && sbt ++$TRAVIS_SCALA_VERSION clean evicted biopetTest biopetTestReport | tee sbt.log"
   - |
     n=`grep -ce "\* com.github.biopet" sbt.log`
     if [ "$n" -ne "0" ]; then echo "ERROR: Found conflicting dependencies inside biopet"; exit 1; fi
