@@ -46,8 +46,8 @@ package object bam {
     */
   def sampleBamMap(bamFiles: List[File]): Map[String, File] = {
     val readers = sampleBamReaderMap(bamFiles)
-    readers.foreach(_._2._1.close())
-    readers.map(x => x._1 -> x._2._2)
+    readers.foreach { case (_, (reader, _)) => reader.close() }
+    readers.map { case (sample, (_, file))  => sample -> file }
   }
 
   def sampleBamReaderMap(
@@ -56,15 +56,17 @@ package object bam {
       val inputSam = SamReaderFactory.makeDefault.open(file)
       val samples =
         inputSam.getFileHeader.getReadGroups.map(_.getSample).distinct
-      if (samples.size == 1) samples.head -> (inputSam, file)
-      else if (samples.size > 1)
-        throw new IllegalArgumentException(
-          "Bam contains multiple sample IDs: " + file)
-      else
-        throw new IllegalArgumentException(
-          "Bam does not contain sample ID or have no readgroups defined: " + file)
+      samples.headOption match {
+        case Some(sample) if samples.size == 1 => sample -> (inputSam, file)
+        case Some(_) =>
+          throw new IllegalArgumentException(
+            "Bam contains multiple sample IDs: " + file)
+        case _ =>
+          throw new IllegalArgumentException(
+            "Bam does not contain sample ID or have no readgroups defined: " + file)
+      }
     }
-    if (temp.map(_._1).distinct.size != temp.size)
+    if (temp.map { case (x, _) => x }.distinct.size != temp.size)
       throw new IllegalArgumentException("Samples has been found twice")
     temp.toMap
   }

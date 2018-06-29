@@ -29,31 +29,36 @@ import htsjdk.samtools.util.Interval
 import nl.biopet.utils.ngs.fasta
 
 import scala.collection.JavaConversions._
-import scala.collection.{immutable, mutable}
+import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
-import nl.biopet.utils.Logging
+import scala.util.control.NonFatal
 
 /**
   * Created by pjvan_thof on 8/20/15.
   */
 case class BedRecordList(chrRecords: Map[String, List[BedRecord]],
                          header: List[String] = Nil) {
-  def allRecords: immutable.Iterable[BedRecord] =
-    for (chr <- chrRecords; record <- chr._2) yield record
+  def allRecords: Iterable[BedRecord] =
+    chrRecords.values.flatten
 
-  def toSamIntervals: immutable.Iterable[Interval] =
+  def toSamIntervals: Iterable[Interval] =
     allRecords.map(_.toSamInterval)
 
   lazy val sorted: BedRecordList = {
-    val sorted = new BedRecordList(
-      chrRecords.map(x => x._1 -> x._2.sortWith((a, b) => a.start < b.start)))
-    if (sorted.chrRecords.forall(x => x._2 == chrRecords(x._1))) this
+    val sorted = new BedRecordList(chrRecords.map {
+      case (key, values) => key -> values.sortWith((a, b) => a.start < b.start)
+    })
+    if (sorted.chrRecords.forall {
+          case (key, values) => values == chrRecords(key)
+        }) this
     else sorted
   }
 
   lazy val isSorted: Boolean = sorted.hashCode() == this
-    .hashCode() || sorted.chrRecords.forall(x => x._2 == chrRecords(x._1))
+    .hashCode() || sorted.chrRecords.forall {
+    case (key, values) => values == chrRecords(key)
+  }
 
   def overlapWith(record: BedRecord): List[BedRecord] =
     sorted.chrRecords
@@ -104,19 +109,22 @@ case class BedRecordList(chrRecords: Map[String, List[BedRecord]],
             def combineOverlap(records: List[BedRecord],
                                newRecords: ListBuffer[BedRecord] = ListBuffer())
               : List[BedRecord] = {
-              if (records.nonEmpty) {
-                val chr = records.head.chr
-                val start = records.head.start
-                val overlapRecords =
-                  records.takeWhile(_.start <= records.head.end)
-                val end = overlapRecords.map(_.end).max
+              records.headOption match {
+                case Some(record) =>
+                  val chr = record.chr
+                  val start = record.start
+                  val overlapRecords =
+                    records.takeWhile(_.start <= record.end)
+                  val end = overlapRecords.map(_.end).max
 
-                newRecords += BedRecord(chr,
-                                        start,
-                                        end,
-                                        _originals = overlapRecords)
-                combineOverlap(records.drop(overlapRecords.length), newRecords)
-              } else newRecords.toList
+                  newRecords += BedRecord(chr,
+                                          start,
+                                          end,
+                                          _originals = overlapRecords)
+                  combineOverlap(records.drop(overlapRecords.length),
+                                 newRecords)
+                case _ => newRecords.toList
+              }
             }
             combineOverlap(records)
           })
@@ -127,7 +135,7 @@ case class BedRecordList(chrRecords: Map[String, List[BedRecord]],
               maxContigsInSingleJob: Option[Int] = None,
               sequenceDict: Option[SAMSequenceDictionary] = None)
     : List[List[BedRecord]] = {
-    val list = allRecords
+    val (list, leftover) = allRecords
       .flatMap(_.scatter(binSize))
       .toList
       .sortWith(sequenceDict match {
@@ -143,19 +151,21 @@ case class BedRecordList(chrRecords: Map[String, List[BedRecord]],
       .reverse
       .foldLeft((List[List[BedRecord]](), List[BedRecord]())) {
         case ((finalList, buffer), record) =>
-          if (buffer.isEmpty) (finalList, record :: buffer)
-          else {
-            val bufferSize = buffer.map(_.length).sum
-            if (!combineContigs && buffer.head.chr != record.chr)
-              (buffer :: finalList, List(record))
-            else if (bufferSize < (binSize / 2) &&
-                     buffer.size < maxContigsInSingleJob.getOrElse(
-                       Int.MaxValue))
-              (finalList, record :: buffer)
-            else (buffer :: finalList, List(record))
+          buffer.headOption match {
+            case Some(r) =>
+              val bufferSize = buffer.map(_.length).sum
+              if (!combineContigs && r.chr != record.chr)
+                (buffer :: finalList, List(record))
+              else if (bufferSize < (binSize / 2) &&
+                       buffer.size < maxContigsInSingleJob.getOrElse(
+                         Int.MaxValue))
+                (finalList, record :: buffer)
+              else (buffer :: finalList, List(record))
+
+            case _ => (finalList, record :: buffer)
           }
       }
-    list._2 :: list._1
+    leftover :: list
   }
 
   def validateContigs(reference: File): BedRecordList = {
@@ -207,7 +217,9 @@ object BedRecordList {
       if (!map.contains(record.chr)) map += record.chr -> ListBuffer()
       map(record.chr) += record
     }
-    new BedRecordList(map.toMap.map(m => m._1 -> m._2.toList), header)
+    new BedRecordList(map.toMap.map {
+      case (key, values) => key -> values.toList
+    }, header)
   }
 
   def fromList(records: Traversable[BedRecord]): BedRecordList =
@@ -257,7 +269,7 @@ object BedRecordList {
             try {
               BedRecord.fromLine(line).validate
             } catch {
-              case e: Exception =>
+              case NonFatal(e) =>
                 throw new IllegalStateException(
                   s"Parsing line number ${idx + 1} failed on file: ${bedFile.getAbsolutePath}",
                   e)
