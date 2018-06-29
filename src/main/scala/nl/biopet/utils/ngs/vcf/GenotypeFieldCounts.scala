@@ -72,7 +72,8 @@ class GenotypeFieldCounts(header: VCFHeader,
   /** Write histograms to a single file */
   def writeToFile(outputFile: File): Unit = {
     val writer = new PrintWriter(outputFile)
-    writer.println(samples.keys.mkString("Sample\t", "\t", ""))
+    val sampleNames = samples.keys.toList.sorted
+    writer.println(sampleNames.mkString("Sample\t", "\t", ""))
     val map = countsMap
     val values =
       map
@@ -80,10 +81,10 @@ class GenotypeFieldCounts(header: VCFHeader,
         .toList
         .sorted
     for (value <- values) {
-      writer.println(
-        samples.keys
-          .map(s => map(s).getOrElse(value, 0L))
-          .mkString(value + "\t", "\t", ""))
+      val line = sampleNames
+        .map(s => map(s).getOrElse(value, 0L))
+        .mkString(value + "\t", "\t", "")
+      writer.println(line)
     }
     writer.close()
   }
