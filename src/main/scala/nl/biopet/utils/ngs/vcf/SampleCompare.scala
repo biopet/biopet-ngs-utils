@@ -37,7 +37,7 @@ class SampleCompare(header: VCFHeader) extends Serializable {
 
   /** This map binds names to sample index */
   val samples: Map[String, Int] =
-    header.getSampleNameToOffset.toMap.map(x => x._1 -> x._2.toInt)
+    header.getSampleNameToOffset.toMap.map { case (k, v) => k -> v.toInt }
 
   protected[SampleCompare] val allelesCounts: Array[Array[Long]] =
     Array.fill(samples.size)(Array.fill(samples.size)(0L))
@@ -83,7 +83,9 @@ class SampleCompare(header: VCFHeader) extends Serializable {
                 sampleToSampleMinDepth: Option[Int]): Unit = {
     val compareSamples = sampleToSampleMinDepth
       .map { dp =>
-        samples.filter(sample => record.getGenotype(sample._2).getDP >= dp)
+        samples.filter {
+          case (_, sample) => record.getGenotype(sample).getDP >= dp
+        }
       }
       .getOrElse(samples)
 
@@ -128,12 +130,12 @@ class SampleCompare(header: VCFHeader) extends Serializable {
                                  outputFile: File,
                                  relative: Boolean = false): Unit = {
     val writer = new PrintWriter(outputFile)
-    val sorted = samples.toList.sortBy(_._1)
+    val sorted = samples.toList.sortBy { case (x, _) => x }
     writer.print("Sample")
-    writer.println("\t" + sorted.map(_._1).mkString("\t"))
+    writer.println("\t" + sorted.map { case (x, _) => x }.mkString("\t"))
     for ((name, idx) <- sorted) {
       writer.print(name)
-      val values = sorted.map(idx2 => counts(idx)(idx2._2))
+      val values = sorted.map { case (_, idx2) => counts(idx)(idx2) }
       if (relative) {
         val total = counts(idx)(idx).toDouble
         writer.println("\t" + values.map(_.toDouble / total).mkString("\t"))
