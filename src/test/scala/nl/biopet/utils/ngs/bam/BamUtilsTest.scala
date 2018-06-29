@@ -272,8 +272,8 @@ class BamUtilsTest extends BiopetTest {
     val readgroups = sampleReadGroups(
       Map("sample01" -> (reader, BamUtilsTest.pairedEndBam01)))
 
-    readgroups.head._1 shouldBe "sample01"
-    readgroups.map(_._2.size).sum shouldBe 2
+    readgroups.keys.headOption shouldBe Some("sample01")
+    readgroups.values.map(_.size).sum shouldBe 2
   }
 
   @Test
