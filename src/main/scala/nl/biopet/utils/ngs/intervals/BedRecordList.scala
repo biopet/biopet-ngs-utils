@@ -154,12 +154,12 @@ case class BedRecordList(chrRecords: Map[String, List[BedRecord]],
           val bufferSize = buffer.map(_.length).sum
           buffer.headOption match {
             case Some(r) if !combineContigs && r.chr != record.chr =>
-              (buffer :: finalList, List(record))
-            case Some(_)
+              (finalList, record :: buffer)
+            case _
                 if bufferSize < (binSize / 2) &&
                   buffer.size < maxContigsInSingleJob.getOrElse(Int.MaxValue) =>
               (finalList, record :: buffer)
-            case _ => (finalList, record :: buffer)
+            case _ => (buffer :: finalList, List(record))
           }
       }
     leftover :: list
