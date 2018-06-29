@@ -151,17 +151,14 @@ case class BedRecordList(chrRecords: Map[String, List[BedRecord]],
       .reverse
       .foldLeft((List[List[BedRecord]](), List[BedRecord]())) {
         case ((finalList, buffer), record) =>
+          val bufferSize = buffer.map(_.length).sum
           buffer.headOption match {
-            case Some(r) =>
-              val bufferSize = buffer.map(_.length).sum
-              if (!combineContigs && r.chr != record.chr)
-                (buffer :: finalList, List(record))
-              else if (bufferSize < (binSize / 2) &&
-                       buffer.size < maxContigsInSingleJob.getOrElse(
-                         Int.MaxValue))
-                (finalList, record :: buffer)
-              else (buffer :: finalList, List(record))
-
+            case Some(r) if !combineContigs && r.chr != record.chr =>
+              (buffer :: finalList, List(record))
+            case Some(_)
+                if bufferSize < (binSize / 2) &&
+                  buffer.size < maxContigsInSingleJob.getOrElse(Int.MaxValue) =>
+              (finalList, record :: buffer)
             case _ => (finalList, record :: buffer)
           }
       }
