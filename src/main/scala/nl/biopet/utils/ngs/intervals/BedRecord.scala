@@ -47,9 +47,11 @@ case class BedRecord(
     protected[intervals] val _originals: List[BedRecord] = Nil) {
 
   def originals(nested: Boolean = true): List[BedRecord] = {
-    if (_originals.isEmpty) List(this)
-    else if (nested) _originals.flatMap(_.originals())
-    else _originals
+    _originals.isEmpty match {
+      case (true)      => List(this)
+      case _ if nested => _originals.flatMap(_.originals())
+      case _           => _originals
+    }
   }
 
   def overlapWith(record: BedRecord): Boolean = {
@@ -75,35 +77,39 @@ case class BedRecord(
     fasta.getSequenceGc(referenceFile, chr, start, end)
   }
 
-  lazy val exons: Option[immutable.IndexedSeq[BedRecord]] =
-    if (blockCount.isDefined && blockSizes.nonEmpty && blockStarts.nonEmpty) {
-      Some(for (i <- 0 until blockCount.get) yield {
-        val exonNumber = strand match {
-          case Some(false) => blockCount.get - i
-          case _           => i + 1
+  lazy val exons: Option[IndexedSeq[BedRecord]] = {
+    blockCount.filter(_ => blockSizes.nonEmpty && blockStarts.nonEmpty).map {
+      c =>
+        for (i <- 0 until c) yield {
+          val exonNumber = strand match {
+            case Some(false) => c - i
+            case _           => i + 1
+          }
+          BedRecord(chr,
+                    start + blockStarts(i),
+                    start + blockStarts(i) + blockSizes(i),
+                    Some(s"exon-$exonNumber"),
+                    _originals = List(this))
         }
-        BedRecord(chr,
-                  start + blockStarts(i),
-                  start + blockStarts(i) + blockSizes(i),
-                  Some(s"exon-$exonNumber"),
-                  _originals = List(this))
-      })
-    } else None
+    }
+  }
 
-  lazy val introns: Option[immutable.IndexedSeq[BedRecord]] =
-    if (blockCount.isDefined && blockSizes.nonEmpty && blockStarts.nonEmpty) {
-      Some(for (i <- 0 until (blockCount.get - 1)) yield {
-        val intronNumber = strand match {
-          case Some(false) => blockCount.get - i
-          case _           => i + 1
+  lazy val introns: Option[IndexedSeq[BedRecord]] = {
+    blockCount.filter(_ => blockSizes.nonEmpty && blockStarts.nonEmpty).map {
+      c =>
+        for (i <- 0 until (blockCount.get - 1)) yield {
+          val intronNumber = strand match {
+            case Some(false) => c - i
+            case _           => i + 1
+          }
+          BedRecord(chr,
+                    start + blockStarts(i) + blockSizes(i),
+                    start + blockStarts(i + 1),
+                    Some(s"intron-$intronNumber"),
+                    _originals = List(this))
         }
-        BedRecord(chr,
-                  start + blockStarts(i) + blockSizes(i),
-                  start + blockStarts(i + 1),
-                  Some(s"intron-$intronNumber"),
-                  _originals = List(this))
-      })
-    } else None
+    }
+  }
 
   lazy val utr5: Option[BedRecord] = (strand, thickStart, thickEnd) match {
     case (Some(true), Some(tStart), Some(tEnd))
@@ -139,7 +145,7 @@ case class BedRecord(
       strand.map(if (_) "+" else "-"),
       thickStart,
       thickEnd,
-      rgbColor.map(x => s"${x._1},${x._2},${x._3}"),
+      rgbColor.map { case (r, g, b) => s"$r,$g,$b" },
       blockCount,
       arrayToOption(blockSizes).map(_.mkString(",")),
       arrayToOption(blockStarts).map(_.mkString(","))
