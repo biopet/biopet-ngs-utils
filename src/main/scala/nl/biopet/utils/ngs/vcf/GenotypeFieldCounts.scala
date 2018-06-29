@@ -37,19 +37,21 @@ class GenotypeFieldCounts(header: VCFHeader,
 
   /** This map binds names to sample index */
   val samples: Map[String, Int] =
-    header.getSampleNameToOffset.toMap.map(x => x._1 -> x._2.toInt)
+    header.getSampleNameToOffset.toMap.map { case (k, v) => k -> v.toInt }
 
   protected[GenotypeFieldCounts] val counts: Map[Int, Counts[String]] =
-    samples.map(_._2 -> new Counts[String]())
+    samples.map { case (_, v) => v -> new Counts[String]() }
 
   protected val _noValue: Array[Long] = Array.fill(samples.size)(0L)
   protected val _total: Array[Long] = Array.fill(samples.size)(0L)
 
   /** Returns per sample the number of records without the field */
-  def noValue: Map[String, Long] = samples.map(x => x._1 -> _noValue(x._2))
+  def noValue: Map[String, Long] = samples.map {
+    case (k, v) => k -> _noValue(v)
+  }
 
   /** Returns per sample the number of total records */
-  def total: Map[String, Long] = samples.map(x => x._1 -> _total(x._2))
+  def total: Map[String, Long] = samples.map { case (k, v) => k -> _total(v) }
 
   /**
     * Add records to counts
@@ -73,11 +75,14 @@ class GenotypeFieldCounts(header: VCFHeader,
     writer.println(samples.keys.mkString("Sample\t", "\t", ""))
     val map = countsMap
     val values =
-      map.foldLeft(Set[String]())((a, b) => a ++ b._2.keys).toList.sorted
+      map
+        .foldLeft(Set[String]()) { case (a, (_, b)) => a ++ b.keys }
+        .toList
+        .sorted
     for (value <- values) {
       writer.println(
-        samples
-          .map(s => map(s._1).getOrElse(value, 0L))
+        samples.keys
+          .map(s => map(s).getOrElse(value, 0L))
           .mkString(value + "\t", "\t", ""))
     }
     writer.close()
@@ -85,7 +90,7 @@ class GenotypeFieldCounts(header: VCFHeader,
 
   /** Return a map of counts */
   def countsMap: Map[String, Map[String, Long]] =
-    samples.map(x => x._1 -> counts(x._2).countsMap)
+    samples.map { case (k, v) => k -> counts(v).countsMap }
 
   def +=(other: GenotypeFieldCounts): GenotypeFieldCounts = {
     for ((idx, c) <- other.counts) {
