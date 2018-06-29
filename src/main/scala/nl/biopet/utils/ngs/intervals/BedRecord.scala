@@ -97,7 +97,7 @@ case class BedRecord(
   lazy val introns: Option[IndexedSeq[BedRecord]] = {
     blockCount.filter(_ => blockSizes.nonEmpty && blockStarts.nonEmpty).map {
       c =>
-        for (i <- 0 until (blockCount.get - 1)) yield {
+        for (i <- 0 until (c - 1)) yield {
           val intronNumber = strand match {
             case Some(false) => c - i
             case _           => i + 1
