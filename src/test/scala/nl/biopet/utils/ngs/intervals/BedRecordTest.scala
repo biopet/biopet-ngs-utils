@@ -116,17 +116,20 @@ class BedRecordTest extends TestNGSuite with Matchers {
 
     val record = BedRecord.fromLine(
       "chrQ\t0\t100\tname\t3\t+\t1\t3\t255,0,0\t2\t10,20\t0,80")
-    val exons = record.exons
-    exons should not be None
-    exons.get(0).originals().head shouldBe record
-    exons.get(0).originals().size shouldBe 1
-    exons.get(1).originals().head shouldBe record
-    exons.get(1).originals().size shouldBe 1
-    exons.get(0).start shouldBe 0
-    exons.get(0).end shouldBe 10
-    exons.get(1).start shouldBe 80
-    exons.get(1).end shouldBe 100
-    exons.get.foldLeft(0)(_ + _.length) shouldBe 30
+    record.exons should not be None
+    record.exons match {
+      case Some(exons) =>
+        exons(0).originals().headOption shouldBe Some(record)
+        exons(0).originals().size shouldBe 1
+        exons(1).originals().headOption shouldBe Some(record)
+        exons(1).originals().size shouldBe 1
+        exons(0).start shouldBe 0
+        exons(0).end shouldBe 10
+        exons(1).start shouldBe 80
+        exons(1).end shouldBe 100
+        exons.foldLeft(0)(_ + _.length) shouldBe 30
+      case _ =>
+    }
   }
 
   @Test def testIntrons(): Unit = {
@@ -136,13 +139,16 @@ class BedRecordTest extends TestNGSuite with Matchers {
 
     val record = BedRecord.fromLine(
       "chrQ\t0\t100\tname\t3\t+\t1\t3\t255,0,0\t2\t10,20\t0,80")
-    val introns = record.introns
-    introns should not be None
-    introns.get(0).originals().head shouldBe record
-    introns.get(0).originals().size shouldBe 1
-    introns.get(0).start shouldBe 10
-    introns.get(0).end shouldBe 80
-    introns.get.foldLeft(0)(_ + _.length) shouldBe 70
+    record.introns should not be None
+    record.introns match {
+      case Some(introns) =>
+        introns(0).originals().headOption shouldBe Some(record)
+        introns(0).originals().size shouldBe 1
+        introns(0).start shouldBe 10
+        introns(0).end shouldBe 80
+        introns.foldLeft(0)(_ + _.length) shouldBe 70
+      case _ =>
+    }
   }
 
   @Test def testExonIntronOverlap(): Unit = {
@@ -150,7 +156,7 @@ class BedRecordTest extends TestNGSuite with Matchers {
       "chrQ\t0\t100\tname\t3\t+\t1\t3\t255,0,0\t2\t10,20\t0,80")
     val exons = record.exons
     val introns = record.introns
-    for (exon <- exons.get; intron <- introns.get) {
+    for (exon <- exons.toList.flatten; intron <- introns.toList.flatten) {
       exon.overlapWith(intron) shouldBe false
     }
   }
@@ -165,8 +171,8 @@ class BedRecordTest extends TestNGSuite with Matchers {
     val utr3 = record.utr3
     utr5 should not be None
     utr3 should not be None
-    utr5.get.length shouldBe 3
-    utr3.get.length shouldBe 7
+    utr5.map(_.length) shouldBe Some(3)
+    utr3.map(_.length) shouldBe Some(7)
 
   }
 
@@ -180,8 +186,8 @@ class BedRecordTest extends TestNGSuite with Matchers {
     val utr3 = record.utr3
     utr5 should not be None
     utr3 should not be None
-    utr5.get.length shouldBe 7
-    utr3.get.length shouldBe 3
+    utr5.map(_.length) shouldBe Some(7)
+    utr3.map(_.length) shouldBe Some(3)
   }
 
   @Test def testOriginals(): Unit = {

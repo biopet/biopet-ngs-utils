@@ -89,8 +89,8 @@ class GenotypeFieldCountsTest extends BiopetTest {
     stats.writeToFile(output)
 
     val lines = Source.fromFile(output).getLines().toList
-    lines.head shouldBe "Sample\tSample_3\tSample_2\tSample_1"
-    lines.tail shouldBe List("1.0\t0\t1\t1", "5.0\t3\t2\t2")
+    lines.head shouldBe "Sample\tSample_1\tSample_2\tSample_3"
+    lines.tail shouldBe List("1.0\t1\t1\t0", "5.0\t2\t2\t3")
   }
 
   @DataProvider(name = "correctMethod")
@@ -121,7 +121,7 @@ class GenotypeFieldCountsTest extends BiopetTest {
     stats.writeToFile(output)
 
     val lines = Source.fromFile(output).getLines().toList
-    lines.head shouldBe "Sample\tSample_3\tSample_2\tSample_1"
-    lines.tail shouldBe List("1\t0\t1\t1", "5\t3\t2\t2")
+    lines.head shouldBe "Sample\tSample_1\tSample_2\tSample_3"
+    lines.tail shouldBe List("1\t1\t1\t0", "5\t2\t2\t3")
   }
 }

@@ -38,7 +38,7 @@ class GenotypeStats(header: VCFHeader) extends Serializable {
 
   /** This map binds names to sample index */
   val samples: Map[String, Int] =
-    header.getSampleNameToOffset.toMap.map(x => x._1 -> x._2.toInt)
+    header.getSampleNameToOffset.toMap.map { case (k, v) => k -> v.toInt }
 
   /** Counts object to store results */
   protected[GenotypeStats] val counts
@@ -60,24 +60,27 @@ class GenotypeStats(header: VCFHeader) extends Serializable {
   /** Write results to a file */
   def writeToTsv(file: File): Unit = {
     val writer = new PrintWriter(file)
-    val sorted = samples.toList.sortBy(_._1)
-    writer.println(sorted.map(_._1).mkString("Sample\t", "\t", ""))
+    val sorted = samples.toList.sortBy { case (x, _) => x }
+    writer.println(
+      sorted.map { case (x, _) => x }.mkString("Sample\t", "\t", ""))
     for (method <- GenotypeStats.values) {
       writer.print(method + "\t")
       writer.println(
-        sorted.map(x => counts(x._2).get(method).getOrElse(0L)).mkString("\t"))
+        sorted
+          .map { case (_, x) => counts(x).get(method).getOrElse(0L) }
+          .mkString("\t"))
     }
     writer.close()
   }
 
   /** Convert to immutable Map */
   def toMap: Map[String, Map[GenotypeStats.Value, Long]] =
-    samples.map(x => x._1 -> counts(x._2).countsMap)
+    samples.map { case (k, v) => k -> counts(v).countsMap }
 
   /** Combine multiple classes into 1 */
   def +=(other: GenotypeStats): GenotypeStats = {
     require(this.samples == other.samples)
-    other.counts.foreach(x => this.counts(x._1) += x._2)
+    other.counts.foreach { case (k, v) => this.counts(k) += v }
     this
   }
 }

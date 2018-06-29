@@ -60,7 +60,9 @@ class InfoFieldCounts(field: VCFInfoHeaderLine, method: FieldMethod.Value)
 
   /** Convert strings to doubles if possible */
   def asHistrogram: Histogram[Double] = {
-    new Histogram[Double](counts.countsMap.map(x => x._1.toDouble -> x._2))
+    new Histogram[Double](counts.countsMap.map {
+      case (k, v) => k.toDouble -> v
+    })
   }
 
   /** Returns a map of the counts */

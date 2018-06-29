@@ -106,7 +106,7 @@ package object fasta {
   }
 
   def readContigMapReverse(file: File): Map[String, String] = {
-    readContigMap(file).flatMap(x => x._2.map(y => y -> x._1))
+    readContigMap(file).flatMap { case (k, v) => v.map(y => y -> k) }
   }
 
   def rebuildContigMap(
@@ -126,16 +126,18 @@ package object fasta {
       val set =
         if (caseSentive)
           map
-            .filter(x => x._1 == name || x._2.contains(name))
-            .flatMap(x => x._2 + x._1)
+            .filter { case (k, v) => k == name || v.contains(name) }
+            .flatMap { case (k, v) => v + k }
             .filter(_ != name)
             .toSet
         else
           map
-            .filter(x =>
-              x._1.toLowerCase == name.toLowerCase || x._2.exists(
-                name.toLowerCase == _.toLowerCase))
-            .flatMap(x => x._2 + x._1)
+            .filter {
+              case (k, v) =>
+                k.toLowerCase == name.toLowerCase || v.exists(
+                  name.toLowerCase == _.toLowerCase)
+            }
+            .flatMap { case (k, v) => v + k }
             .filter(_.toLowerCase != name.toLowerCase)
             .toSet
       name -> set
