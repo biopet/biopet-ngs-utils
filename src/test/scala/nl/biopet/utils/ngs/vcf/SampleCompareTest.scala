@@ -32,7 +32,25 @@ import scala.collection.JavaConversions._
 import scala.io.Source
 
 class SampleCompareTest extends BiopetTest {
-  @Test
+
+  def outputAlleleAbs(outputDir: File) = new File(outputDir, "allele.abs.tsv")
+  def outputAlleleRel(outputDir: File) = new File(outputDir, "allele.rel.tsv")
+  def outputGenotypeAbs(outputDir: File) =
+    new File(outputDir, "genotype.abs.tsv")
+  def outputGenotypeRel(outputDir: File) =
+    new File(outputDir, "genotype.rel.tsv")
+  def outputGenotypeRef(outputDir: File) =
+    new File(outputDir, "genotype.ref.abs.tsv")
+  def outputAlleleRef(outputDir: File) =
+    new File(outputDir, "allele.ref.abs.tsv")
+  def outputGenotypeNonref(outputDir: File) =
+    new File(outputDir, "genotype.non_ref.abs.tsv")
+  def outputAlleleNonref(outputDir: File) =
+    new File(outputDir, "allele.non_ref.abs.tsv")
+
+  val addRecordsDir: File = Files.createTempDirectory("sampleCompare").toFile
+
+  @Test(groups = Array("generate"))
   def testAddRecords(): Unit = {
     val reader = new VCFFileReader(resourceFile("/multi.vcf"), false)
 
@@ -47,19 +65,15 @@ class SampleCompareTest extends BiopetTest {
     compare.genotypesCount(compare.samples("Sample_1"))(
       compare.samples("Sample_2")) shouldBe 3L
 
-    val tempDir = Files.createTempDirectory("sampleCompare").toFile
-    compare.writeAllFiles(tempDir)
-    new File(tempDir, "allele.abs.tsv") should exist
-    new File(tempDir, "allele.rel.tsv") should exist
-    new File(tempDir, "genotype.abs.tsv") should exist
-    new File(tempDir, "genotype.rel.tsv") should exist
-    new File(tempDir, "genotype.ref.abs.tsv") should exist
-    new File(tempDir, "allele.ref.abs.tsv") should exist
-    new File(tempDir, "genotype.non_ref.abs.tsv") should exist
-    new File(tempDir, "allele.non_ref.abs.tsv") should exist
+    compare.writeAllFiles(addRecordsDir)
+  }
 
+  @Test(dependsOnGroups = Array("generate"))
+  def testAddRecordsAlleleAbs(): Unit = {
+    val file = outputAlleleAbs(addRecordsDir)
+    file should exist
     Source
-      .fromFile(new File(tempDir, "allele.abs.tsv"))
+      .fromFile(file)
       .getLines()
       .toList shouldBe List(
       "Sample\tSample_1\tSample_2\tSample_3",
@@ -67,9 +81,14 @@ class SampleCompareTest extends BiopetTest {
       "Sample_2\t7\t8\t7",
       "Sample_3\t6\t7\t8"
     )
+  }
 
+  @Test(dependsOnGroups = Array("generate"))
+  def testAddRecordsAlleleRel(): Unit = {
+    val file = outputAlleleRel(addRecordsDir)
+    file should exist
     Source
-      .fromFile(new File(tempDir, "allele.rel.tsv"))
+      .fromFile(file)
       .getLines()
       .toList shouldBe List(
       "Sample\tSample_1\tSample_2\tSample_3",
@@ -77,9 +96,14 @@ class SampleCompareTest extends BiopetTest {
       "Sample_2\t0.875\t1.0\t0.875",
       "Sample_3\t0.75\t0.875\t1.0"
     )
+  }
 
+  @Test(dependsOnGroups = Array("generate"))
+  def testAddRecordsGenotypeAbs(): Unit = {
+    val file = outputGenotypeAbs(addRecordsDir)
+    file should exist
     Source
-      .fromFile(new File(tempDir, "genotype.abs.tsv"))
+      .fromFile(file)
       .getLines()
       .toList shouldBe List(
       "Sample\tSample_1\tSample_2\tSample_3",
@@ -87,8 +111,14 @@ class SampleCompareTest extends BiopetTest {
       "Sample_2\t3\t4\t3",
       "Sample_3\t2\t3\t4"
     )
+  }
+
+  @Test(dependsOnGroups = Array("generate"))
+  def testAddRecordsGenotypeRel(): Unit = {
+    val file = outputGenotypeRel(addRecordsDir)
+    file should exist
     Source
-      .fromFile(new File(tempDir, "genotype.rel.tsv"))
+      .fromFile(file)
       .getLines()
       .toList shouldBe List(
       "Sample\tSample_1\tSample_2\tSample_3",
@@ -96,9 +126,14 @@ class SampleCompareTest extends BiopetTest {
       "Sample_2\t0.75\t1.0\t0.75",
       "Sample_3\t0.5\t0.75\t1.0"
     )
+  }
 
+  @Test(dependsOnGroups = Array("generate"))
+  def testAddRecordsGenotypeRef(): Unit = {
+    val file = outputGenotypeRef(addRecordsDir)
+    file should exist
     Source
-      .fromFile(new File(tempDir, "genotype.ref.abs.tsv"))
+      .fromFile(file)
       .getLines()
       .toList shouldBe List(
       "Sample\tSample_1\tSample_2\tSample_3",
@@ -106,9 +141,14 @@ class SampleCompareTest extends BiopetTest {
       "Sample_2\t1\t2\t2",
       "Sample_3\t1\t2\t3"
     )
+  }
 
+  @Test(dependsOnGroups = Array("generate"))
+  def testAddRecordsAlleleRef(): Unit = {
+    val file = outputAlleleRef(addRecordsDir)
+    file should exist
     Source
-      .fromFile(new File(tempDir, "allele.ref.abs.tsv"))
+      .fromFile(file)
       .getLines()
       .toList shouldBe List(
       "Sample\tSample_1\tSample_2\tSample_3",
@@ -116,19 +156,14 @@ class SampleCompareTest extends BiopetTest {
       "Sample_2\t5\t6\t6",
       "Sample_3\t5\t6\t7"
     )
+  }
 
+  @Test(dependsOnGroups = Array("generate"))
+  def testAddRecordsGenotypeNonref(): Unit = {
+    val file = outputGenotypeNonref(addRecordsDir)
+    file should exist
     Source
-      .fromFile(new File(tempDir, "genotype.non_ref.abs.tsv"))
-      .getLines()
-      .toList shouldBe List(
-      "Sample\tSample_1\tSample_2\tSample_3",
-      "Sample_1\t3\t2\t1",
-      "Sample_2\t2\t2\t1",
-      "Sample_3\t1\t1\t1"
-    )
-
-    Source
-      .fromFile(new File(tempDir, "allele.non_ref.abs.tsv"))
+      .fromFile(file)
       .getLines()
       .toList shouldBe List(
       "Sample\tSample_1\tSample_2\tSample_3",
@@ -138,7 +173,24 @@ class SampleCompareTest extends BiopetTest {
     )
   }
 
-  @Test
+  @Test(dependsOnGroups = Array("generate"))
+  def testAddRecordsAlleleNonref(): Unit = {
+    val file = outputAlleleNonref(addRecordsDir)
+    file should exist
+    Source
+      .fromFile(file)
+      .getLines()
+      .toList shouldBe List(
+      "Sample\tSample_1\tSample_2\tSample_3",
+      "Sample_1\t3\t2\t1",
+      "Sample_2\t2\t2\t1",
+      "Sample_3\t1\t1\t1"
+    )
+  }
+
+  val combineDir: File = Files.createTempDirectory("sampleCompare").toFile
+
+  @Test(groups = Array("generate"))
   def testCombine(): Unit = {
     val reader = new VCFFileReader(resourceFile("/multi.vcf"), false)
 
@@ -155,19 +207,15 @@ class SampleCompareTest extends BiopetTest {
     compare.genotypesCount(compare.samples("Sample_1"))(
       compare.samples("Sample_2")) shouldBe 6L
 
-    val tempDir = Files.createTempDirectory("sampleCompare").toFile
-    compare.writeAllFiles(tempDir)
-    new File(tempDir, "allele.abs.tsv") should exist
-    new File(tempDir, "allele.rel.tsv") should exist
-    new File(tempDir, "genotype.abs.tsv") should exist
-    new File(tempDir, "genotype.rel.tsv") should exist
-    new File(tempDir, "genotype.ref.abs.tsv") should exist
-    new File(tempDir, "allele.ref.abs.tsv") should exist
-    new File(tempDir, "genotype.non_ref.abs.tsv") should exist
-    new File(tempDir, "allele.non_ref.abs.tsv") should exist
+    compare.writeAllFiles(combineDir)
+  }
 
+  @Test(dependsOnGroups = Array("generate"))
+  def testCombineAlleleAbs(): Unit = {
+    val file = outputAlleleAbs(combineDir)
+    file should exist
     Source
-      .fromFile(new File(tempDir, "allele.abs.tsv"))
+      .fromFile(file)
       .getLines()
       .toList shouldBe List(
       "Sample\tSample_1\tSample_2\tSample_3",
@@ -175,9 +223,14 @@ class SampleCompareTest extends BiopetTest {
       "Sample_2\t14\t16\t14",
       "Sample_3\t12\t14\t16"
     )
+  }
 
+  @Test(dependsOnGroups = Array("generate"))
+  def testCombineAlleleRel(): Unit = {
+    val file = outputAlleleRel(combineDir)
+    file should exist
     Source
-      .fromFile(new File(tempDir, "allele.rel.tsv"))
+      .fromFile(file)
       .getLines()
       .toList shouldBe List(
       "Sample\tSample_1\tSample_2\tSample_3",
@@ -185,9 +238,14 @@ class SampleCompareTest extends BiopetTest {
       "Sample_2\t0.875\t1.0\t0.875",
       "Sample_3\t0.75\t0.875\t1.0"
     )
+  }
 
+  @Test(dependsOnGroups = Array("generate"))
+  def testCombineGenotypeAbs(): Unit = {
+    val file = outputGenotypeAbs(combineDir)
+    file should exist
     Source
-      .fromFile(new File(tempDir, "genotype.abs.tsv"))
+      .fromFile(file)
       .getLines()
       .toList shouldBe List(
       "Sample\tSample_1\tSample_2\tSample_3",
@@ -195,8 +253,14 @@ class SampleCompareTest extends BiopetTest {
       "Sample_2\t6\t8\t6",
       "Sample_3\t4\t6\t8"
     )
+  }
+
+  @Test(dependsOnGroups = Array("generate"))
+  def testCombineGenotypeRel(): Unit = {
+    val file = outputGenotypeRel(combineDir)
+    file should exist
     Source
-      .fromFile(new File(tempDir, "genotype.rel.tsv"))
+      .fromFile(file)
       .getLines()
       .toList shouldBe List(
       "Sample\tSample_1\tSample_2\tSample_3",
@@ -204,19 +268,14 @@ class SampleCompareTest extends BiopetTest {
       "Sample_2\t0.75\t1.0\t0.75",
       "Sample_3\t0.5\t0.75\t1.0"
     )
+  }
 
+  @Test(dependsOnGroups = Array("generate"))
+  def testCombineAlleleRef(): Unit = {
+    val file = outputAlleleRef(combineDir)
+    file should exist
     Source
-      .fromFile(new File(tempDir, "genotype.ref.abs.tsv"))
-      .getLines()
-      .toList shouldBe List(
-      "Sample\tSample_1\tSample_2\tSample_3",
-      "Sample_1\t2\t2\t2",
-      "Sample_2\t2\t4\t4",
-      "Sample_3\t2\t4\t6"
-    )
-
-    Source
-      .fromFile(new File(tempDir, "allele.ref.abs.tsv"))
+      .fromFile(file)
       .getLines()
       .toList shouldBe List(
       "Sample\tSample_1\tSample_2\tSample_3",
@@ -224,19 +283,14 @@ class SampleCompareTest extends BiopetTest {
       "Sample_2\t10\t12\t12",
       "Sample_3\t10\t12\t14"
     )
+  }
 
+  @Test(dependsOnGroups = Array("generate"))
+  def testCombineGenotypeNonref(): Unit = {
+    val file = outputGenotypeNonref(combineDir)
+    file should exist
     Source
-      .fromFile(new File(tempDir, "genotype.non_ref.abs.tsv"))
-      .getLines()
-      .toList shouldBe List(
-      "Sample\tSample_1\tSample_2\tSample_3",
-      "Sample_1\t6\t4\t2",
-      "Sample_2\t4\t4\t2",
-      "Sample_3\t2\t2\t2"
-    )
-
-    Source
-      .fromFile(new File(tempDir, "allele.non_ref.abs.tsv"))
+      .fromFile(file)
       .getLines()
       .toList shouldBe List(
       "Sample\tSample_1\tSample_2\tSample_3",
@@ -246,7 +300,24 @@ class SampleCompareTest extends BiopetTest {
     )
   }
 
-  @Test
+  @Test(dependsOnGroups = Array("generate"))
+  def testCombineAlleleNonref(): Unit = {
+    val file = outputAlleleNonref(combineDir)
+    file should exist
+    Source
+      .fromFile(file)
+      .getLines()
+      .toList shouldBe List(
+      "Sample\tSample_1\tSample_2\tSample_3",
+      "Sample_1\t6\t4\t2",
+      "Sample_2\t4\t4\t2",
+      "Sample_3\t2\t2\t2"
+    )
+  }
+
+  val depthFilterDir: File = Files.createTempDirectory("sampleCompare").toFile
+
+  @Test(groups = Array("generate"))
   def testDepthFilter(): Unit = {
     val reader = new VCFFileReader(resourceFile("/multi.vcf"), false)
 
@@ -254,29 +325,15 @@ class SampleCompareTest extends BiopetTest {
     reader.foreach(compare.addRecord(_, Some(5)))
     reader.close()
 
-    val tempDir = Files.createTempDirectory("sampleCompare").toFile
-    compare.writeAllFiles(tempDir)
-    new File(tempDir, "allele.abs.tsv") should exist
-    new File(tempDir, "allele.rel.tsv") should exist
-    new File(tempDir, "genotype.abs.tsv") should exist
-    new File(tempDir, "genotype.rel.tsv") should exist
-    new File(tempDir, "genotype.ref.abs.tsv") should exist
-    new File(tempDir, "allele.ref.abs.tsv") should exist
-    new File(tempDir, "genotype.non_ref.abs.tsv") should exist
-    new File(tempDir, "allele.non_ref.abs.tsv") should exist
+    compare.writeAllFiles(depthFilterDir)
+  }
 
+  @Test(dependsOnGroups = Array("generate"))
+  def testDepthFilterAlleleRel(): Unit = {
+    val file = outputAlleleRel(depthFilterDir)
+    file should exist
     Source
-      .fromFile(new File(tempDir, "allele.abs.tsv"))
-      .getLines()
-      .toList shouldBe List(
-      "Sample\tSample_1\tSample_2\tSample_3",
-      "Sample_1\t4\t1\t3",
-      "Sample_2\t1\t4\t3",
-      "Sample_3\t3\t3\t6"
-    )
-
-    Source
-      .fromFile(new File(tempDir, "allele.rel.tsv"))
+      .fromFile(file)
       .getLines()
       .toList shouldBe List(
       "Sample\tSample_1\tSample_2\tSample_3",
@@ -284,9 +341,14 @@ class SampleCompareTest extends BiopetTest {
       "Sample_2\t0.25\t1.0\t0.75",
       "Sample_3\t0.5\t0.5\t1.0"
     )
+  }
 
+  @Test(dependsOnGroups = Array("generate"))
+  def testDepthFilterGenptypeAbs(): Unit = {
+    val file = outputGenotypeAbs(depthFilterDir)
+    file should exist
     Source
-      .fromFile(new File(tempDir, "genotype.abs.tsv"))
+      .fromFile(file)
       .getLines()
       .toList shouldBe List(
       "Sample\tSample_1\tSample_2\tSample_3",
@@ -294,9 +356,14 @@ class SampleCompareTest extends BiopetTest {
       "Sample_2\t0\t2\t1",
       "Sample_3\t1\t1\t3"
     )
+  }
 
+  @Test(dependsOnGroups = Array("generate"))
+  def testDepthFilterGenotypeRel(): Unit = {
+    val file = outputGenotypeRel(depthFilterDir)
+    file should exist
     Source
-      .fromFile(new File(tempDir, "genotype.rel.tsv"))
+      .fromFile(file)
       .getLines()
       .toList shouldBe List(
       "Sample\tSample_1\tSample_2\tSample_3",
@@ -304,9 +371,14 @@ class SampleCompareTest extends BiopetTest {
       "Sample_2\t0.0\t1.0\t0.5",
       "Sample_3\t0.3333333333333333\t0.3333333333333333\t1.0"
     )
+  }
 
+  @Test(dependsOnGroups = Array("generate"))
+  def testDepthFilterGenotypeRef(): Unit = {
+    val file = outputGenotypeRef(depthFilterDir)
+    file should exist
     Source
-      .fromFile(new File(tempDir, "genotype.ref.abs.tsv"))
+      .fromFile(file)
       .getLines()
       .toList shouldBe List(
       "Sample\tSample_1\tSample_2\tSample_3",
@@ -314,9 +386,14 @@ class SampleCompareTest extends BiopetTest {
       "Sample_2\t0\t1\t1",
       "Sample_3\t0\t1\t2"
     )
+  }
 
+  @Test(dependsOnGroups = Array("generate"))
+  def testDepthFilterAlleleRef(): Unit = {
+    val file = outputAlleleRef(depthFilterDir)
+    file should exist
     Source
-      .fromFile(new File(tempDir, "allele.ref.abs.tsv"))
+      .fromFile(file)
       .getLines()
       .toList shouldBe List(
       "Sample\tSample_1\tSample_2\tSample_3",
@@ -324,9 +401,14 @@ class SampleCompareTest extends BiopetTest {
       "Sample_2\t1\t3\t3",
       "Sample_3\t2\t3\t5"
     )
+  }
 
+  @Test(dependsOnGroups = Array("generate"))
+  def testDepthFilterGenotypeNonref(): Unit = {
+    val file = outputGenotypeNonref(depthFilterDir)
+    file should exist
     Source
-      .fromFile(new File(tempDir, "genotype.non_ref.abs.tsv"))
+      .fromFile(file)
       .getLines()
       .toList shouldBe List(
       "Sample\tSample_1\tSample_2\tSample_3",
@@ -334,9 +416,14 @@ class SampleCompareTest extends BiopetTest {
       "Sample_2\t0\t1\t0",
       "Sample_3\t1\t0\t1"
     )
+  }
 
+  @Test(dependsOnGroups = Array("generate"))
+  def testDepthFilterAlleleNonref(): Unit = {
+    val file = outputAlleleNonref(depthFilterDir)
+    file should exist
     Source
-      .fromFile(new File(tempDir, "allele.non_ref.abs.tsv"))
+      .fromFile(file)
       .getLines()
       .toList shouldBe List(
       "Sample\tSample_1\tSample_2\tSample_3",
