@@ -48,8 +48,9 @@ class GenotypeStatsTest extends BiopetTest {
     stats.writeToTsv(new File(tempDir, "genotype.tsv"))
     val lines =
       Source.fromFile(new File(tempDir, "genotype.tsv")).getLines().toList
-    lines.headOption shouldBe Some(stats.samples.keys.toList.sorted)
-      .mkString("Sample\t", "\t", "")
+    lines.headOption shouldBe Some(
+      stats.samples.keys.toList.sorted
+        .mkString("Sample\t", "\t", ""))
     lines.map(_.split("\t")).map(_.length).distinct shouldBe List(4)
     GenotypeStats.values.foreach(s =>
       require(lines.exists(_.startsWith(s.toString + "\t")), s"$s not found"))
@@ -73,8 +74,9 @@ class GenotypeStatsTest extends BiopetTest {
     stats.writeToTsv(new File(tempDir, "genotype.tsv"))
     val lines =
       Source.fromFile(new File(tempDir, "genotype.tsv")).getLines().toList
-    lines.headOption shouldBe Some(stats.samples.keys.toList.sorted)
-      .mkString("Sample\t", "\t", "")
+    lines.headOption shouldBe Some(
+      stats.samples.keys.toList.sorted
+        .mkString("Sample\t", "\t", ""))
     lines.map(_.split("\t")).map(_.length).distinct shouldBe List(4)
     GenotypeStats.values.foreach(s =>
       require(lines.exists(_.startsWith(s.toString + "\t")), s"$s not found"))
