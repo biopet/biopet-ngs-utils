@@ -53,7 +53,7 @@ case class Feature(contig: String,
         case None        => "."
       },
       frame.getOrElse("."),
-      attributes.map(x => x._1 + s""" "${x._2}"""").mkString("; ")
+      attributes.map { case (k, v) => k + s""" "$v"""" }.mkString("; ")
     ).mkString("\t")
 
   def asGff3Line: String =
@@ -70,7 +70,7 @@ case class Feature(contig: String,
         case None        => "."
       },
       frame.getOrElse("."),
-      attributes.map(x => x._1 + s"=${x._2}").mkString(";")
+      attributes.map { case (k, v) => k + s"=$v" }.mkString(";")
     ).mkString("\t")
 
   def minPosition: Int = if (start < end) start else end

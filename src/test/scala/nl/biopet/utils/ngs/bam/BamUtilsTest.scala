@@ -262,8 +262,8 @@ class BamUtilsTest extends BiopetTest {
   def testReadgroup(): Unit = {
     val readgroups = sampleReadGroups(List(BamUtilsTest.pairedEndBam01))
 
-    readgroups.head._1 shouldBe "sample01"
-    readgroups.map(_._2.size).sum shouldBe 2
+    readgroups.headOption.map { case (x, _) => x } shouldBe Some("sample01")
+    readgroups.values.map(_.size).sum shouldBe 2
   }
 
   @Test
