@@ -48,7 +48,7 @@ class GenotypeStatsTest extends BiopetTest {
     stats.writeToTsv(new File(tempDir, "genotype.tsv"))
     val lines =
       Source.fromFile(new File(tempDir, "genotype.tsv")).getLines().toList
-    lines.head shouldBe stats.samples.keys.toList.sorted
+    lines.headOption shouldBe Some(stats.samples.keys.toList.sorted)
       .mkString("Sample\t", "\t", "")
     lines.map(_.split("\t")).map(_.length).distinct shouldBe List(4)
     GenotypeStats.values.foreach(s =>
@@ -73,7 +73,7 @@ class GenotypeStatsTest extends BiopetTest {
     stats.writeToTsv(new File(tempDir, "genotype.tsv"))
     val lines =
       Source.fromFile(new File(tempDir, "genotype.tsv")).getLines().toList
-    lines.head shouldBe stats.samples.keys.toList.sorted
+    lines.headOption shouldBe Some(stats.samples.keys.toList.sorted)
       .mkString("Sample\t", "\t", "")
     lines.map(_.split("\t")).map(_.length).distinct shouldBe List(4)
     GenotypeStats.values.foreach(s =>
