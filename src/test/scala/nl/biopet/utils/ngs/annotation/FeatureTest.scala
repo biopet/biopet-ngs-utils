@@ -25,37 +25,23 @@ import nl.biopet.test.BiopetTest
 import org.testng.annotations.Test
 
 class FeatureTest extends BiopetTest {
-  @Test
-  def testGtfLine(): Unit = {
 
+  @Test
+  def testGtfLineToshort(): Unit = {
     intercept[IllegalArgumentException] {
       Feature.fromLine("line")
     }.getMessage shouldBe "requirement failed: A Gtf line should have 8 or 9 columns, gtf line: 'line'"
+  }
 
-    Feature
-      .fromLine("chr1\tHAVANA\tgene\t11869\t14412\t3.0\t+\t.")
-      .score shouldBe Some(3.0)
-    Feature
-      .fromLine("chr1\tHAVANA\tgene\t11869\t14412\t.\t-\t.")
-      .score shouldBe None
-    intercept[IllegalStateException] {
-      Feature.fromLine("chr1\tHAVANA\tgene\t11869\t14412\tnot_a_number\t-\t.")
-    }.getMessage shouldBe "Score in a gtf line must be number"
-
-    Feature
-      .fromLine("chr1\tHAVANA\tgene\t11869\t14412\t.\t+\t.")
-      .strand shouldBe Some(true)
-    Feature
-      .fromLine("chr1\tHAVANA\tgene\t11869\t14412\t.\t-\t.")
-      .strand shouldBe Some(false)
-    Feature
-      .fromLine("chr1\tHAVANA\tgene\t11869\t14412\t.\t.\t.")
-      .strand shouldBe None
-
+  @Test
+  def testWrongFrame(): Unit = {
     intercept[IllegalArgumentException] {
-      Feature.fromLine("chr1\tHAVANA\tgene\t11869\t14412\t.\t%\t.")
-    }.getMessage should startWith("strand only allows '+' or '-', not %")
+      Feature.fromLine("chr1\tHAVANA\tgene\t11869\t14412\t.\t.\tto_long")
+    }.getMessage should startWith("'to_long' can not be parsed as frame")
+  }
 
+  @Test
+  def testFrame(): Unit = {
     Feature
       .fromLine("chr1\tHAVANA\tgene\t11869\t14412\t.\t+\t1")
       .frame shouldBe Some('1')
@@ -65,10 +51,39 @@ class FeatureTest extends BiopetTest {
     Feature
       .fromLine("chr1\tHAVANA\tgene\t11869\t14412\t.\t.\t.")
       .frame shouldBe None
+  }
 
+  @Test
+  def testWrongStrand(): Unit = {
     intercept[IllegalArgumentException] {
-      Feature.fromLine("chr1\tHAVANA\tgene\t11869\t14412\t.\t.\tto_long")
-    }.getMessage should startWith("'to_long' can not be parsed as frame")
+      Feature.fromLine("chr1\tHAVANA\tgene\t11869\t14412\t.\t%\t.")
+    }.getMessage should startWith("strand only allows '+' or '-', not %")
+  }
+
+  @Test
+  def testStrand(): Unit = {
+    Feature
+      .fromLine("chr1\tHAVANA\tgene\t11869\t14412\t.\t+\t.")
+      .strand shouldBe Some(true)
+    Feature
+      .fromLine("chr1\tHAVANA\tgene\t11869\t14412\t.\t-\t.")
+      .strand shouldBe Some(false)
+    Feature
+      .fromLine("chr1\tHAVANA\tgene\t11869\t14412\t.\t.\t.")
+      .strand shouldBe None
+  }
+
+  @Test
+  def testGtfLine(): Unit = {
+    Feature
+      .fromLine("chr1\tHAVANA\tgene\t11869\t14412\t3.0\t+\t.")
+      .score shouldBe Some(3.0)
+    Feature
+      .fromLine("chr1\tHAVANA\tgene\t11869\t14412\t.\t-\t.")
+      .score shouldBe None
+    intercept[IllegalStateException] {
+      Feature.fromLine("chr1\tHAVANA\tgene\t11869\t14412\tnot_a_number\t-\t.")
+    }.getMessage shouldBe "Score in a gtf line must be number"
 
     val line =
       "chr1\tHAVANA\tgene\t11869\t14412\t.\t+\t.\tgene_id \"ENSG00000223972.4\"; havana_gene \"OTTHUMG00000000961.2\"; gene_status \"KNOWN\"; gene_name \"DDX11L1\"; transcript_id \"ENSG00000223972.4\"; gene_type \"pseudogene\"; transcript_type \"pseudogene\"; transcript_name \"DDX11L1\"; transcript_status \"KNOWN\"; level \"2\""
