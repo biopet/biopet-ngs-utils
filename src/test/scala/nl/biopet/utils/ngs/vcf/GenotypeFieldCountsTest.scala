@@ -89,7 +89,7 @@ class GenotypeFieldCountsTest extends BiopetTest {
     stats.writeToFile(output)
 
     val lines = Source.fromFile(output).getLines().toList
-    lines.head shouldBe "Sample\tSample_1\tSample_2\tSample_3"
+    lines.headOption shouldBe Some("Sample\tSample_1\tSample_2\tSample_3")
     lines.tail shouldBe List("1.0\t1\t1\t0", "5.0\t2\t2\t3")
   }
 
@@ -121,7 +121,7 @@ class GenotypeFieldCountsTest extends BiopetTest {
     stats.writeToFile(output)
 
     val lines = Source.fromFile(output).getLines().toList
-    lines.head shouldBe "Sample\tSample_1\tSample_2\tSample_3"
+    lines.headOption shouldBe Some("Sample\tSample_1\tSample_2\tSample_3")
     lines.tail shouldBe List("1\t1\t1\t0", "5\t2\t2\t3")
   }
 }
