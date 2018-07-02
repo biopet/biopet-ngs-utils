@@ -187,7 +187,7 @@ package object vcf {
       record.getAttributes == other.getAttributes &&
       record.getGenotypesOrderedByName
         .zip(other.getGenotypesOrderedByName)
-        .forall { case (k, v) => k.identicalGenotype(v) }
+        .forall { case (g1, g2) => g1.identicalGenotype(g2) }
     }
 
     /**
