@@ -38,7 +38,7 @@ class VcfFieldTest extends BiopetTest {
     intercept[IllegalArgumentException] {
       VcfField.fromArg("DP:All:Extra")
     }.getMessage should startWith(
-      "requirement failed: A field should be formatted like: <tag>:<method>. Possible methods: ")
+      "A field should be formatted like: <tag>:<method>. Possible methods: ")
 
     intercept[IllegalArgumentException] {
       VcfField.fromArg("DP:Something_else")

@@ -50,7 +50,7 @@ class GeneralStatsTest extends BiopetTest {
     val lines =
       Source.fromFile(new File(tempDir, "general.tsv")).getLines().toList
     lines.map(_.split("\t")).map(_.length).distinct shouldBe List(2)
-    lines.head shouldBe "value\tcount"
+    lines.headOption shouldBe Some("value\tcount")
     GeneralStats.values.foreach(
       s =>
         require(lines.exists(_.startsWith(s.toString + "\t")),
@@ -77,7 +77,7 @@ class GeneralStatsTest extends BiopetTest {
     val lines =
       Source.fromFile(new File(tempDir, "general.tsv")).getLines().toList
     lines.map(_.split("\t")).map(_.length).distinct shouldBe List(2)
-    lines.head shouldBe "value\tcount"
+    lines.headOption shouldBe Some("value\tcount")
     GeneralStats.values.foreach(s =>
       require(lines.exists(_.startsWith(s.toString + "\t")), s"$s not found"))
   }

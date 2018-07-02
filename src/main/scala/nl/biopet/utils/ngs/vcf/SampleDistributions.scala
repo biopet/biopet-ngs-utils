@@ -43,7 +43,7 @@ class SampleDistributions extends Serializable {
 
   /** Convert to immutable Map */
   def toMap: Map[GenotypeStats.Value, Map[Int, Long]] =
-    counts.map(x => x._1 -> x._2.countsMap)
+    counts.map { case (k, v) => k -> v.countsMap }
 
   /** Write results to a directory */
   def writeToDir(outputDir: File): Unit = {

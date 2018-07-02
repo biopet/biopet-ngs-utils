@@ -25,6 +25,7 @@ pipeline {
                 sh "#!/bin/bash\n" +
                         "set -e -v -o pipefail\n" +
                         "${sbt} clean biopetTest | tee sbt.log"
+                sh "touch target/test-reports/*.xml"
                 junit 'target/test-reports/*.xml'
                 sh "#!/bin/bash\n" +
                         "set -e -v -o pipefail\n" +
@@ -45,12 +46,10 @@ pipeline {
         }
     }
     post {
-        always {
-            sh "touch target/test-reports/*.xml"
-            junit 'target/test-reports/*.xml'
-        }
         failure {
             slackSend(color: '#FF0000', message: "Failure: Job '${env.JOB_NAME} #${env.BUILD_NUMBER}' (<${env.BUILD_URL}|Open>)", channel: '#biopet-bot', teamDomain: 'lumc', tokenCredentialId: 'lumc')
+            sh "touch target/test-reports/*.xml"
+            junit 'target/test-reports/*.xml'
         }
         unstable {
             slackSend(color: '#FFCC00', message: "Unstable: Job '${env.JOB_NAME} #${env.BUILD_NUMBER}' (<${env.BUILD_URL}|Open>)", channel: '#biopet-bot', teamDomain: 'lumc', tokenCredentialId: 'lumc')

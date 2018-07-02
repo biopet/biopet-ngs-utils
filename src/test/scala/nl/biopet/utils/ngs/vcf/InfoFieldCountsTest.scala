@@ -134,7 +134,7 @@ class InfoFieldCountsTest extends BiopetTest {
     val outputFilr = File.createTempFile("test.", ".tsv")
     stats.writeHistogram(outputFilr)
     val lines = Source.fromFile(outputFilr).getLines().toList
-    lines.head shouldBe "value\tcount"
+    lines.headOption shouldBe Some("value\tcount")
     lines(1) shouldBe "1\t6"
     lines(2) shouldBe "2\t4"
     lines(3) shouldBe "3\t2"

@@ -156,8 +156,6 @@ class VcfUtilsTest extends BiopetTest {
     val alleles1 = List(Allele.create("A", true), Allele.create("C"))
     val alleles2 = List(Allele.create("A", true), Allele.create("G"))
     val alleles3 = List(Allele.create("AGC", true), Allele.create("G"))
-    val alleles4 =
-      List(Allele.create("A", true), Allele.create("C"), Allele.create("G"))
 
     val v1 = new VariantContextBuilder()
       .chr("chrQ")
@@ -202,6 +200,15 @@ class VcfUtilsTest extends BiopetTest {
       .make()
     v5.identicalVariantContext(v5) shouldBe true
     v4.identicalVariantContext(v5) shouldBe false
+  }
+
+  @Test
+  def testIdenticalVariantContextGenotypes(): Unit = {
+    val alleles1 = List(Allele.create("A", true), Allele.create("C"))
+    val alleles2 = List(Allele.create("A", true), Allele.create("G"))
+    val alleles3 = List(Allele.create("AGC", true), Allele.create("G"))
+    val alleles4 =
+      List(Allele.create("A", true), Allele.create("C"), Allele.create("G"))
 
     val g1 = GenotypeBuilder.create("test", alleles1)
     val g2 = GenotypeBuilder.create("test", alleles2)

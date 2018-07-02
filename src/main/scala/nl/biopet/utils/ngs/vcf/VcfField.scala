@@ -37,21 +37,19 @@ case class VcfField(key: String, method: FieldMethod.Value) {
 
 object VcfField {
   def fromArg(arg: String): VcfField = {
-    val values = arg.split(":")
-    require(
-      values.size == 2,
-      s"A field should be formatted like: <tag>:<method>. Possible methods: ${FieldMethod.values
-        .mkString(", ")}")
-    val key: String = values.head
-    val method: FieldMethod.Value = try {
-      FieldMethod.withName(values(1))
-    } catch {
-      case e: NoSuchElementException =>
+    arg.split(":").toList match {
+      case List(key: String, value: String) =>
+        val method: FieldMethod.Value =
+          FieldMethod.values
+            .find(_.toString == value)
+            .getOrElse(throw new IllegalArgumentException(
+              s"Method '$value' does not exis. Possible methods: ${FieldMethod.values
+                .mkString(", ")}t"))
+        VcfField(key, method)
+      case _ =>
         throw new IllegalArgumentException(
-          s"Method '${values(1)}' does not exis. Possible methods: ${FieldMethod.values
-            .mkString(", ")}t",
-          e)
+          s"A field should be formatted like: <tag>:<method>. Possible methods: ${FieldMethod.values
+            .mkString(", ")}")
     }
-    VcfField(key, method)
   }
 }

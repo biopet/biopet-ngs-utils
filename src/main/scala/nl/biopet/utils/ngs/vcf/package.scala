@@ -73,11 +73,13 @@ package object vcf {
   }
 
   def getVcfIndexFile(vcfFile: File): File = {
-    val name = vcfFile.getPath
-    if (name.endsWith(".vcf")) new File(name + ".idx")
-    else if (name.endsWith(".vcf.gz")) new File(name + ".tbi")
-    else
-      throw new IllegalArgumentException(s"File given is no vcf file: $vcfFile")
+    vcfFile.getPath match {
+      case n if n.endsWith(".vcf")    => new File(n + ".idx")
+      case n if n.endsWith(".vcf.gz") => new File(n + ".tbi")
+      case _ =>
+        throw new IllegalArgumentException(
+          s"File given is no vcf file: $vcfFile")
+    }
   }
 
   def vcfFileIsEmpty(file: File): Boolean = {
@@ -185,7 +187,7 @@ package object vcf {
       record.getAttributes == other.getAttributes &&
       record.getGenotypesOrderedByName
         .zip(other.getGenotypesOrderedByName)
-        .forall(x => x._1.identicalGenotype(x._2))
+        .forall { case (g1, g2) => g1.identicalGenotype(g2) }
     }
 
     /**
