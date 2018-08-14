@@ -194,4 +194,25 @@ package object bam {
     reader.close()
     dict
   }
+
+  /**
+    * This will retrieve the [[SAMSequenceDictionary]] from the bam file.
+    * When `referenceFasta is given he will validate this against the bam file.`
+    */
+  def validateReferenceInBam(
+      bamFile: File,
+      referenceFasta: Option[File]): SAMSequenceDictionary = {
+    val samReader = SamReaderFactory.makeDefault().open(bamFile)
+    val samHeader = samReader.getFileHeader
+    samReader.close()
+    referenceFasta
+      .map { f =>
+        samHeader.getSequenceDictionary.assertSameDictionary(
+          fasta.getCachedDict(f),
+          false)
+        fasta.getCachedDict(f)
+      }
+      .getOrElse(samHeader.getSequenceDictionary)
+  }
+
 }
