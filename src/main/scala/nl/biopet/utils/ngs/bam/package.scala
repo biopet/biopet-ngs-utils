@@ -23,12 +23,7 @@ package nl.biopet.utils.ngs
 
 import java.io.File
 
-import htsjdk.samtools.{
-  SAMReadGroupRecord,
-  SAMSequenceDictionary,
-  SamReader,
-  SamReaderFactory
-}
+import htsjdk.samtools._
 
 import scala.collection.JavaConversions._
 import scala.collection.parallel.immutable
@@ -205,6 +200,12 @@ package object bam {
     val samReader = SamReaderFactory.makeDefault().open(bamFile)
     val samHeader = samReader.getFileHeader
     samReader.close()
+    validateReferenceInBam(samHeader, referenceFasta)
+  }
+
+  def validateReferenceInBam(
+      samHeader: SAMFileHeader,
+      referenceFasta: Option[File]): SAMSequenceDictionary = {
     referenceFasta
       .map { f =>
         samHeader.getSequenceDictionary.assertSameDictionary(
@@ -214,5 +215,4 @@ package object bam {
       }
       .getOrElse(samHeader.getSequenceDictionary)
   }
-
 }
