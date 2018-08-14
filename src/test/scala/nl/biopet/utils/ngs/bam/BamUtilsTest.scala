@@ -305,6 +305,13 @@ class BamUtilsTest extends BiopetTest {
       dict3.assertSameDictionary(dict4, false)
     }
   }
+
+  @Test
+  def testValidateReferenceInBam(): Unit = {
+    validateReferenceInBam(
+      resourceFile("/paired01.bam"),
+      resourceFile("/fake_chrQ.fa"))
+  }
 }
 
 object BamUtilsTest {
