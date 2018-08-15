@@ -272,6 +272,42 @@
       <p class="shortcomment cmt">This method will return all readgroups for each sample
 </p><div class="fullcomment"><div class="comment cmt"><p>This method will return all readgroups for each sample
 </p></div><dl class="paramcmts block"><dt class="param">bamFiles</dt><dd class="cmt"><p>input bam files</p></dd><dt>returns</dt><dd class="cmt"><p>Map of sample readgroups</p></dd></dl><dl class="attributes block"> <dt>Exceptions thrown</dt><dd><span class="cmt"></span></dd></dl></div>
+    </li><li name="nl.biopet.utils.ngs.bam#validateReferenceInBam" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="validateReferenceInBam(samHeader:htsjdk.samtools.SAMFileHeader,referenceFasta:java.io.File):htsjdk.samtools.SAMSequenceDictionary"></a>
+      <a id="validateReferenceInBam(SAMFileHeader,File):SAMSequenceDictionary"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">validateReferenceInBam</span><span class="params">(<span name="samHeader">samHeader: <span class="extype" name="htsjdk.samtools.SAMFileHeader">SAMFileHeader</span></span>, <span name="referenceFasta">referenceFasta: <span class="extype" name="java.io.File">File</span></span>)</span><span class="result">: <span class="extype" name="htsjdk.samtools.SAMSequenceDictionary">SAMSequenceDictionary</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#nl.biopet.utils.ngs.bam.package@validateReferenceInBam(samHeader:htsjdk.samtools.SAMFileHeader,referenceFasta:java.io.File):htsjdk.samtools.SAMSequenceDictionary" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="nl.biopet.utils.ngs.bam#validateReferenceInBam" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="validateReferenceInBam(bamFile:java.io.File,referenceFasta:java.io.File):htsjdk.samtools.SAMSequenceDictionary"></a>
+      <a id="validateReferenceInBam(File,File):SAMSequenceDictionary"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">validateReferenceInBam</span><span class="params">(<span name="bamFile">bamFile: <span class="extype" name="java.io.File">File</span></span>, <span name="referenceFasta">referenceFasta: <span class="extype" name="java.io.File">File</span></span>)</span><span class="result">: <span class="extype" name="htsjdk.samtools.SAMSequenceDictionary">SAMSequenceDictionary</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#nl.biopet.utils.ngs.bam.package@validateReferenceInBam(bamFile:java.io.File,referenceFasta:java.io.File):htsjdk.samtools.SAMSequenceDictionary" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">This will retrieve the <span class="extype" name="SAMSequenceDictionary">SAMSequenceDictionary</span> from the bam file.</p><div class="fullcomment"><div class="comment cmt"><p>This will retrieve the <span class="extype" name="SAMSequenceDictionary">SAMSequenceDictionary</span> from the bam file.
+When <code>referenceFasta is given he will validate this against the bam file.</code>
+</p></div></div>
     </li></ol>
             </div>
 
@@ -288,7 +324,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name deprecated" title="Deprecated: Please use scala.tools.nsc.doc.base.MemberLookupBase$$anon$1@3e0c9d2">contigInsertSize</span><span class="params">(<span name="inputBam">inputBam: <span class="extype" name="java.io.File">File</span></span>, <span name="contig">contig: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="start">start: <span class="extype" name="scala.Int">Int</span></span>, <span name="end">end: <span class="extype" name="scala.Int">Int</span></span>, <span name="samplingSize">samplingSize: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">10000</span></span>, <span name="binSize">binSize: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">1000000</span></span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Int">Int</span>]</span>
+        <span class="name deprecated" title="Deprecated: Please use scala.tools.nsc.doc.base.MemberLookupBase$$anon$1@27107338">contigInsertSize</span><span class="params">(<span name="inputBam">inputBam: <span class="extype" name="java.io.File">File</span></span>, <span name="contig">contig: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="start">start: <span class="extype" name="scala.Int">Int</span></span>, <span name="end">end: <span class="extype" name="scala.Int">Int</span></span>, <span name="samplingSize">samplingSize: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">10000</span></span>, <span name="binSize">binSize: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">1000000</span></span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Int">Int</span>]</span>
       </span>
       </h4><span class="permalink">
       <a href="../../../../../index.html#nl.biopet.utils.ngs.bam.package@contigInsertSize(inputBam:java.io.File,contig:String,start:Int,end:Int,samplingSize:Int,binSize:Int):Option[Int]" title="Permalink" target="_top">
