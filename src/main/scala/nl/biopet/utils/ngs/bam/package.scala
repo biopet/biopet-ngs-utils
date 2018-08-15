@@ -23,12 +23,7 @@ package nl.biopet.utils.ngs
 
 import java.io.File
 
-import htsjdk.samtools.{
-  SAMReadGroupRecord,
-  SAMSequenceDictionary,
-  SamReader,
-  SamReaderFactory
-}
+import htsjdk.samtools._
 
 import scala.collection.JavaConversions._
 import scala.collection.parallel.immutable
@@ -193,5 +188,24 @@ package object bam {
     val dict = reader.getFileHeader.getSequenceDictionary
     reader.close()
     dict
+  }
+
+  /**
+    * This will retrieve the [[SAMSequenceDictionary]] from the bam file.
+    * When `referenceFasta is given he will validate this against the bam file.`
+    */
+  def validateReferenceInBam(bamFile: File,
+                             referenceFasta: File): SAMSequenceDictionary = {
+    val samReader = SamReaderFactory.makeDefault().open(bamFile)
+    val samHeader = samReader.getFileHeader
+    samReader.close()
+    validateReferenceInBam(samHeader, referenceFasta)
+  }
+
+  def validateReferenceInBam(samHeader: SAMFileHeader,
+                             referenceFasta: File): SAMSequenceDictionary = {
+    samHeader.getSequenceDictionary
+      .assertSameDictionary(fasta.getCachedDict(referenceFasta), false)
+    fasta.getCachedDict(referenceFasta)
   }
 }
