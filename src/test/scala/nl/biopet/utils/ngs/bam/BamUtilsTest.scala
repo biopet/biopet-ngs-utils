@@ -307,10 +307,17 @@ class BamUtilsTest extends BiopetTest {
   }
 
   @Test
-  def testValidateReferenceInBam(): Unit = {
-    validateReferenceInBam(
-      resourceFile("/paired01.bam"),
-      resourceFile("/fake_chrQ.fa"))
+  def testValidateReferenceInBamNotValid(): Unit = {
+    intercept[AssertionError] {
+      validateReferenceInBam(resourceFile("/paired01.bam"),
+                             resourceFile("/fake_chrQ.fa"))
+    }
+  }
+
+  @Test
+  def testValidateReferenceInBamValid(): Unit = {
+    validateReferenceInBam(resourceFile("/paired_valid.bam"),
+                           resourceFile("/fake_chrQ.fa"))
   }
 }
 
