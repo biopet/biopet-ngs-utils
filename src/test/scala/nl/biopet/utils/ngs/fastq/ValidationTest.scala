@@ -26,20 +26,29 @@ import org.testng.annotations.{DataProvider, Test}
 
 class ValidationTest extends BiopetTest {
 
+  /**
+    * Create generic fastq record with header specified. Useful for testing headers
+    * @param name The name header
+    * @return FastqRecord
+    */
+  def fastq(name: String): FastqRecord = {
+    new FastqRecord(name, "ATGC", "+", "AA!!")
+  }
+
   @DataProvider(name = "validPairs")
   def provider(): Array[Array[Any]] =
     Array(
       Array(
-        new FastqRecord("@SEQ_ID 1", "ATGC", "+", "AA!!"),
-        new FastqRecord("@SEQ_ID 2", "ATGC", "+", "AA!!")
+        fastq("@SEQ_ID 1"),
+        fastq("@SEQ_ID 2")
       ),
       Array(
-        new FastqRecord("@SEQ_ID/1", "ATGC", "+", "AA!!"),
-        new FastqRecord("@SEQ_ID/2", "ATGC", "+", "AA!!")
+        fastq("@SEQ_ID/1"),
+        fastq("@SEQ_ID/2")
       ),
       Array(
-        new FastqRecord("@SEQ_ID.1", "ATGC", "+", "AA!!"),
-        new FastqRecord("@SEQ_ID.2", "ATGC", "+", "AA!!")
+        fastq("@SEQ_ID.1"),
+        fastq("@SEQ_ID.2")
       )
     )
 
@@ -47,16 +56,16 @@ class ValidationTest extends BiopetTest {
   def invalidPairs(): Array[Array[Any]] =
     Array(
       Array(
-        new FastqRecord("@SEQ_ID 1", "ATGC", "+", "AA!!"),
-        new FastqRecord("@SEQ_IDASD 2", "ATGC", "+", "AA!!")
+        fastq("@SEQ_ID 1"),
+        fastq("@SEQ_IDASD 2")
       ),
       Array(
-        new FastqRecord("@SEQ_ID/1", "ATGC", "+", "AA!!"),
-        new FastqRecord("@SEQ_ID/3", "ATGC", "+", "AA!!")
+        fastq("@SEQ_ID/1"),
+        fastq("@SEQ_ID/3")
       ),
       Array(
-        new FastqRecord("@SEQ_ID.1", "ATGC", "+", "AA!!"),
-        new FastqRecord("@SEQ_ID..2", "ATGC", "+", "AA!!")
+        fastq("@SEQ_ID.1"),
+        fastq("@SEQ_ID..2")
       )
     )
 
