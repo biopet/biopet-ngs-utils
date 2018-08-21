@@ -12,7 +12,10 @@ class ValidationTest extends BiopetTest {
     val r1 = new FastqReader(resourceFile("/R1.fq"))
     val r2 = new FastqReader(resourceFile("/R2.fq"))
     val pairs = r1.iterator().toList.zip(r2.iterator().toList)
-    pairs.foreach {case (r1, r2) => Validation.checkMate(r1, r2) shouldBe true}
+    pairs.foreach {
+      case (r1, r2) =>
+        Validation.checkMate(r1, r2) shouldBe true
+    }
   }
 
   @Test
@@ -20,6 +23,10 @@ class ValidationTest extends BiopetTest {
     val r1 = new FastqReader(resourceFile("/R1.fq"))
     val r2 = new FastqReader(resourceFile("/R2_invalid.fq"))
     val pairs = r1.iterator().toList.zip(r2.iterator().toList)
-    pairs.foreach {case (r1, r2) => Validation.checkMate(r1, r2) shouldBe false}
+    pairs.foreach {
+      case (r1, r2) =>
+        println(r1, r2)
+        Validation.checkMate(r1, r2) shouldBe false
+    }
   }
 }
