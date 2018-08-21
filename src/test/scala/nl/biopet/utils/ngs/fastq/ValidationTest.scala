@@ -20,33 +20,114 @@
  */
 
 package nl.biopet.utils.ngs.fastq.validation
-import htsjdk.samtools.fastq.FastqReader
+import htsjdk.samtools.fastq.FastqRecord
 import nl.biopet.test.BiopetTest
-import org.testng.annotations.Test
+import org.testng.annotations.{DataProvider, Test}
 
-import scala.collection.JavaConversions._
 class ValidationTest extends BiopetTest {
 
-  @Test
-  def testValidPairs(): Unit = {
-    val r1 = new FastqReader(resourceFile("/R1.fq"))
-    val r2 = new FastqReader(resourceFile("/R2.fq"))
-    val pairs = r1.iterator().toList.zip(r2.iterator().toList)
-    pairs.foreach {
-      case (r1, r2) =>
-        checkMate(r1, r2) shouldBe true
-    }
+  @DataProvider(name = "validPairs")
+  def provider(): Array[Array[Any]] =
+    Array(
+      Array(
+        new FastqRecord(
+          "@SEQ_ID 1",
+          "ATGC",
+          "+",
+          "AA!!"
+        ),
+        new FastqRecord(
+          "@SEQ_ID 2",
+          "ATGC",
+          "+",
+          "AA!!"
+        )
+      ),
+      Array(
+        new FastqRecord(
+          "@SEQ_ID/1",
+          "ATGC",
+          "+",
+          "AA!!"
+        ),
+        new FastqRecord(
+          "@SEQ_ID/2",
+          "ATGC",
+          "+",
+          "AA!!"
+        )
+      ),
+      Array(
+        new FastqRecord(
+          "@SEQ_ID.1",
+          "ATGC",
+          "+",
+          "AA!!"
+        ),
+        new FastqRecord(
+          "@SEQ_ID.2",
+          "ATGC",
+          "+",
+          "AA!!"
+        )
+      )
+    )
+
+  @DataProvider(name = "invalidPairs")
+  def invalidPairs(): Array[Array[Any]] =
+    Array(
+      Array(
+        new FastqRecord(
+          "@SEQ_ID 1",
+          "ATGC",
+          "+",
+          "AA!!"
+        ),
+        new FastqRecord(
+          "@SEQ_IDASD 2",
+          "ATGC",
+          "+",
+          "AA!!"
+        )
+      ),
+      Array(
+        new FastqRecord(
+          "@SEQ_ID/1",
+          "ATGC",
+          "+",
+          "AA!!"
+        ),
+        new FastqRecord(
+          "@SEQ_ID/3",
+          "ATGC",
+          "+",
+          "AA!!"
+        )
+      ),
+      Array(
+        new FastqRecord(
+          "@SEQ_ID.1",
+          "ATGC",
+          "+",
+          "AA!!"
+        ),
+        new FastqRecord(
+          "@SEQ_ID..2",
+          "ATGC",
+          "+",
+          "AA!!"
+        )
+      )
+    )
+
+  @Test(dataProvider = "validPairs")
+  def testValidPairs(r1: FastqRecord, r2: FastqRecord): Unit = {
+    checkMate(r1, r2) shouldBe true
   }
 
-  @Test
-  def testInvalidPairs(): Unit = {
-    val r1 = new FastqReader(resourceFile("/R1.fq"))
-    val r2 = new FastqReader(resourceFile("/R2_invalid.fq"))
-    val pairs = r1.iterator().toList.zip(r2.iterator().toList)
-    pairs.foreach {
-      case (r1, r2) =>
-        println(r1, r2)
-        checkMate(r1, r2) shouldBe false
-    }
+  @Test(dataProvider = "invalidPairs")
+  def testInvalidPairs(r1: FastqRecord, r2: FastqRecord): Unit = {
+    checkMate(r1, r2) shouldBe false
   }
+
 }
