@@ -1,0 +1,12 @@
+@SEQ_ID_A 1
+ATGC
++
+AA!!
+@SEQ_ID_B/1
+ATGC
++
+AA!!
+@SEQ_ID_C.1
+ATGC
++
+AA!!
