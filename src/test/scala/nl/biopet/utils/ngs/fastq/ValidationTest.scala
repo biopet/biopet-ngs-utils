@@ -30,46 +30,16 @@ class ValidationTest extends BiopetTest {
   def provider(): Array[Array[Any]] =
     Array(
       Array(
-        new FastqRecord(
-          "@SEQ_ID 1",
-          "ATGC",
-          "+",
-          "AA!!"
-        ),
-        new FastqRecord(
-          "@SEQ_ID 2",
-          "ATGC",
-          "+",
-          "AA!!"
-        )
+        new FastqRecord("@SEQ_ID 1", "ATGC", "+", "AA!!"),
+        new FastqRecord("@SEQ_ID 2", "ATGC", "+", "AA!!")
       ),
       Array(
-        new FastqRecord(
-          "@SEQ_ID/1",
-          "ATGC",
-          "+",
-          "AA!!"
-        ),
-        new FastqRecord(
-          "@SEQ_ID/2",
-          "ATGC",
-          "+",
-          "AA!!"
-        )
+        new FastqRecord("@SEQ_ID/1", "ATGC", "+", "AA!!"),
+        new FastqRecord("@SEQ_ID/2", "ATGC", "+", "AA!!")
       ),
       Array(
-        new FastqRecord(
-          "@SEQ_ID.1",
-          "ATGC",
-          "+",
-          "AA!!"
-        ),
-        new FastqRecord(
-          "@SEQ_ID.2",
-          "ATGC",
-          "+",
-          "AA!!"
-        )
+        new FastqRecord("@SEQ_ID.1", "ATGC", "+", "AA!!"),
+        new FastqRecord("@SEQ_ID.2", "ATGC", "+", "AA!!")
       )
     )
 
@@ -77,46 +47,16 @@ class ValidationTest extends BiopetTest {
   def invalidPairs(): Array[Array[Any]] =
     Array(
       Array(
-        new FastqRecord(
-          "@SEQ_ID 1",
-          "ATGC",
-          "+",
-          "AA!!"
-        ),
-        new FastqRecord(
-          "@SEQ_IDASD 2",
-          "ATGC",
-          "+",
-          "AA!!"
-        )
+        new FastqRecord("@SEQ_ID 1", "ATGC", "+", "AA!!"),
+        new FastqRecord("@SEQ_IDASD 2", "ATGC", "+", "AA!!")
       ),
       Array(
-        new FastqRecord(
-          "@SEQ_ID/1",
-          "ATGC",
-          "+",
-          "AA!!"
-        ),
-        new FastqRecord(
-          "@SEQ_ID/3",
-          "ATGC",
-          "+",
-          "AA!!"
-        )
+        new FastqRecord("@SEQ_ID/1", "ATGC", "+", "AA!!"),
+        new FastqRecord("@SEQ_ID/3", "ATGC", "+", "AA!!")
       ),
       Array(
-        new FastqRecord(
-          "@SEQ_ID.1",
-          "ATGC",
-          "+",
-          "AA!!"
-        ),
-        new FastqRecord(
-          "@SEQ_ID..2",
-          "ATGC",
-          "+",
-          "AA!!"
-        )
+        new FastqRecord("@SEQ_ID.1", "ATGC", "+", "AA!!"),
+        new FastqRecord("@SEQ_ID..2", "ATGC", "+", "AA!!")
       )
     )
 
