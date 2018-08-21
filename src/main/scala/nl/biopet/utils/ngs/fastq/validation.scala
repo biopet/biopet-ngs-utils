@@ -23,10 +23,11 @@ package nl.biopet.utils.ngs.fastq
 
 import htsjdk.samtools.fastq.FastqRecord
 
-object Validation {
+package object validation {
 
   /**
     * This method checks if the pair is the same ID
+    *
     * @param r1 R1 fastq record
     * @param r2 R2 fastq record
     * @return Boolean

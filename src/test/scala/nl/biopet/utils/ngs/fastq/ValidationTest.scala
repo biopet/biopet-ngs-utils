@@ -19,8 +19,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package nl.biopet.utils.ngs.fastq
-
+package nl.biopet.utils.ngs.fastq.validation
 import htsjdk.samtools.fastq.FastqReader
 import nl.biopet.test.BiopetTest
 import org.testng.annotations.Test
@@ -35,7 +34,7 @@ class ValidationTest extends BiopetTest {
     val pairs = r1.iterator().toList.zip(r2.iterator().toList)
     pairs.foreach {
       case (r1, r2) =>
-        Validation.checkMate(r1, r2) shouldBe true
+        checkMate(r1, r2) shouldBe true
     }
   }
 
@@ -47,7 +46,7 @@ class ValidationTest extends BiopetTest {
     pairs.foreach {
       case (r1, r2) =>
         println(r1, r2)
-        Validation.checkMate(r1, r2) shouldBe false
+        checkMate(r1, r2) shouldBe false
     }
   }
 }
