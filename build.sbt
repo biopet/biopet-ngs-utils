@@ -17,7 +17,7 @@ crossScalaVersions := Seq("2.11.12", "2.12.5")
 
 scalaVersion := "2.11.12"
 
-libraryDependencies += "com.github.biopet" %% "common-utils" % "0.7-SNAPSHOT"
+libraryDependencies += "com.github.biopet" %% "common-utils" % "0.7"
 libraryDependencies += "com.github.samtools" % "htsjdk" % "2.15.1"
 
 libraryDependencies += "com.github.biopet" %% "test-utils" % "0.4" % Test
