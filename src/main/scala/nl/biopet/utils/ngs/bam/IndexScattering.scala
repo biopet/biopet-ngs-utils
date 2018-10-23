@@ -33,20 +33,24 @@ object IndexScattering {
   def createBamBinsReference(
       bamFile: File,
       chunks: Int,
-      mixContigs: Boolean = true): List[List[BedRecord]] = {
+      mixContigs: Boolean = true,
+      splitContigs: Boolean = true
+      ): List[List[BedRecord]] = {
     val samReader = SamReaderFactory.makeDefault().open(bamFile)
     val dict = samReader.getFileHeader.getSequenceDictionary
     samReader.close()
     createBamBins(BedRecordList.fromDict(dict).allRecords.toList,
                   bamFile,
                   chunks,
+                  splitContigs,
                   mixContigs)
   }
 
   def createBamBins(regions: List[BedRecord],
                     bamFile: File,
                     chunks: Int,
-                    mixContigs: Boolean = true): List[List[BedRecord]] = {
+                    mixContigs: Boolean = true,
+                    splitContigs: Boolean = true): List[List[BedRecord]] = {
     createBamBinsWithSize(regions, bamFile, chunks, mixContigs).map {
       case (r, _) => r
     }
@@ -56,7 +60,8 @@ object IndexScattering {
       regions: List[BedRecord],
       bamFile: File,
       chunks: Int,
-      mixContigs: Boolean = true): List[(List[BedRecord], Long)] = {
+      mixContigs: Boolean = true,
+      splitContigs: Boolean = true): List[(List[BedRecord], Long)] = {
     val samReader = SamReaderFactory.makeDefault().open(bamFile)
     val dict = samReader.getFileHeader.getSequenceDictionary
     val index = samReader.indexing().getIndex

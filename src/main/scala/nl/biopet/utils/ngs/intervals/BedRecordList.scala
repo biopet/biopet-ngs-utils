@@ -143,6 +143,7 @@ case class BedRecordList(chrRecords: Map[String, List[BedRecord]],
     }
     // If contigs can not be split, return all records
     else allRecords.toList
+
     val sortedRegions = binnedRegions
       .sortWith(sequenceDict match {
         case Some(order) => // Sort by chromosome, start position if sequenceDict is given
@@ -155,6 +156,7 @@ case class BedRecordList(chrRecords: Map[String, List[BedRecord]],
             l.length < r.length
       })
       .reverse
+
     val (list, leftover) =
       sortedRegions.foldLeft((List[List[BedRecord]](), List[BedRecord]())) {
         case ((finalList, buffer), record) =>
