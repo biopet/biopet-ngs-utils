@@ -132,12 +132,19 @@ case class BedRecordList(chrRecords: Map[String, List[BedRecord]],
 
   def scatter(binSize: Int,
               combineContigs: Boolean = true,
+              splitContigs: Boolean = true,
               maxContigsInSingleJob: Option[Int] = None,
               sequenceDict: Option[SAMSequenceDictionary] = None)
     : List[List[BedRecord]] = {
-    val (list, leftover) = allRecords
-      .flatMap(_.scatter(binSize))
-      .toList
+    val binnedRegions = if (splitContigs) {
+      allRecords
+        .flatMap(_.scatter(binSize))
+        .toList
+    }
+    // If contigs can not be split, return all records
+    else allRecords.toList
+
+    val sortedRegions = binnedRegions
       .sortWith(sequenceDict match {
         case Some(order) => // Sort by chromosome, start position if sequenceDict is given
           (l, r) =>
@@ -149,7 +156,9 @@ case class BedRecordList(chrRecords: Map[String, List[BedRecord]],
             l.length < r.length
       })
       .reverse
-      .foldLeft((List[List[BedRecord]](), List[BedRecord]())) {
+
+    val (list, leftover) =
+      sortedRegions.foldLeft((List[List[BedRecord]](), List[BedRecord]())) {
         case ((finalList, buffer), record) =>
           val bufferSize = buffer.map(_.length).sum
           buffer.headOption match {

@@ -33,30 +33,36 @@ object IndexScattering {
   def createBamBinsReference(
       bamFile: File,
       chunks: Int,
-      mixContigs: Boolean = true): List[List[BedRecord]] = {
+      mixContigs: Boolean = true,
+      splitContigs: Boolean = true
+  ): List[List[BedRecord]] = {
     val samReader = SamReaderFactory.makeDefault().open(bamFile)
     val dict = samReader.getFileHeader.getSequenceDictionary
     samReader.close()
     createBamBins(BedRecordList.fromDict(dict).allRecords.toList,
                   bamFile,
                   chunks,
-                  mixContigs)
+                  mixContigs,
+                  splitContigs)
   }
 
   def createBamBins(regions: List[BedRecord],
                     bamFile: File,
                     chunks: Int,
-                    mixContigs: Boolean = true): List[List[BedRecord]] = {
-    createBamBinsWithSize(regions, bamFile, chunks, mixContigs).map {
-      case (r, _) => r
-    }
+                    mixContigs: Boolean = true,
+                    splitContigs: Boolean = true): List[List[BedRecord]] = {
+    createBamBinsWithSize(regions, bamFile, chunks, mixContigs, splitContigs)
+      .map {
+        case (r, _) => r
+      }
   }
 
   def createBamBinsWithSize(
       regions: List[BedRecord],
       bamFile: File,
       chunks: Int,
-      mixContigs: Boolean = true): List[(List[BedRecord], Long)] = {
+      mixContigs: Boolean = true,
+      splitContigs: Boolean = true): List[(List[BedRecord], Long)] = {
     val samReader = SamReaderFactory.makeDefault().open(bamFile)
     val dict = samReader.getFileHeader.getSequenceDictionary
     val index = samReader.indexing().getIndex
@@ -77,12 +83,13 @@ object IndexScattering {
       if (mixContigs) {
         createBamBinsRecurive(sizeEachRegion.filter {
           case (_, length) => length > 0
-        }, sizePerBin, dict, index)
+        }, sizePerBin, dict, index, splitContigs)
       } else {
         sizeEachRegion
           .groupBy { case (r, _) => r.headOption.map(_.chr) }
           .map {
-            case (_, x) => createBamBinsRecurive(x, sizePerBin, dict, index)
+            case (_, x) =>
+              createBamBinsRecurive(x, sizePerBin, dict, index, splitContigs)
           }
           .reduce(_ ::: _)
       }
@@ -95,8 +102,10 @@ object IndexScattering {
       sizePerBin: Long,
       dict: SAMSequenceDictionary,
       index: BAMIndex,
+      splitRegions: Boolean = true,
       minSize: Int = 200,
-      iterations: Int = 1): List[(List[BedRecord], Long)] = {
+      iterations: Int = 1
+  ): List[(List[BedRecord], Long)] = {
     val (rebin, large, medium, small) = regions.foldLeft(
       (List[(List[BedRecord], Long)](),
        List[(List[BedRecord], Long)](),
@@ -115,7 +124,7 @@ object IndexScattering {
         }
     }
 
-    if (rebin.nonEmpty && iterations > 0) {
+    if (rebin.nonEmpty && iterations > 0 && splitRegions) {
       val total = splitBins(rebin, sizePerBin, dict, index) ::: medium ::: combineBins(
         small,
         sizePerBin) ::: large
@@ -123,6 +132,7 @@ object IndexScattering {
                             sizePerBin,
                             dict,
                             index,
+                            splitRegions,
                             minSize,
                             iterations - 1)
     } else {
